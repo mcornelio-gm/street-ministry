@@ -199,7 +199,11 @@ def build_mkdocs() -> bool:
             return False
         shutil.rmtree(old_dir, ignore_errors=True)
         if os.path.isdir(SITE_DOCS_DIR):
-            os.rename(SITE_DOCS_DIR, old_dir)
+            try:
+                os.rename(SITE_DOCS_DIR, old_dir)
+            except OSError:
+                # e.g. EXDEV on container overlay filesystems: fall back to delete
+                shutil.rmtree(SITE_DOCS_DIR, ignore_errors=True)
         os.rename(new_dir, SITE_DOCS_DIR)
         shutil.rmtree(old_dir, ignore_errors=True)
     return True

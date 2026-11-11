@@ -11,8 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Pre-build the MkDocs Documents site into site/documents
-RUN mkdocs build
+# Verify the MkDocs site builds (fails the image build on errors). The real build
+# happens at startup, after the content bucket is attached, in a writable layer.
+RUN mkdocs build --site-dir /tmp/site-check && rm -rf /tmp/site-check
 
 # Cloud Run provides $PORT (default 8080)
 CMD exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}
