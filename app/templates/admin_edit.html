@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}{{ "New" if is_new else "Edit" }} {{ kind_label }} | Admin{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/easymde@2.18.0/dist/easymde.min.css">
+{% endblock %}
+{% block content %}
+{% set m = item.meta %}
+<section class="container admin-section">
+  <nav class="breadcrumb-nav"><a href="/admin">Admin</a><span class="sep">/</span><span class="current">{{ "New" if is_new else "Edit" }} {{ kind_label }}</span></nav>
+  <h1>{{ "New" if is_new else "Edit" }} {{ kind_label }}</h1>
+
+  {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
+
+  <form method="post" action="/admin/{{ kind }}/save" class="card admin-edit-form" id="editForm">
+    {% if item.slug %}<input type="hidden" name="slug" value="{{ item.slug }}">{% endif %}
+
+    <div class="admin-grid">
+      <div class="form-group admin-span-2">
+        <label for="title">Title</label>
+        <input id="title" name="title" value="{{ m.title or '' }}" required maxlength="160">
+      </div>
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" value="{{ m.date or '' }}" required>
+      </div>
+      <div class="form-group">
+        <label for="author">Author</label>
+        <input id="author" name="author" value="{{ m.author or '' }}" placeholder="e.g. Sarah M. or Outreach Team 4">
+      </div>
+
+      {% if kind == "stories" %}
+      <div class="form-group">
+        <label for="city">City</label>
+        <select id="city" name="city" required>
+          <option value="">Choose a city…</option>
+          {% for c in cities %}<option value="{{ c }}" {% if m.city == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="tags">Tags <span class="admin-hint-inline">comma separated</span></label>
+        <input id="tags" name="tags" value="{{ m.tags or '' }}" placeholder="Encampment, Meals">
+      </div>
+      <div class="form-group admin-span-2">
+        <label for="summary">Summary <span class="admin-hint-inline">one or two sentences shown on the story card</span></label>
+        <textarea id="summary" name="summary" rows="2" maxlength="400">{{ m.summary or '' }}</textarea>
+      </div>
+      <div class="admin-privacy-hint admin-span-2">
+        <i data-lucide="shield"></i>
+        <div><strong>Protect our friends' privacy.</strong> Use first names only, or a pseudonym with “(name changed)”
+          if details could identify someone. Never use last names, exact sleeping locations, or photos without consent.</div>
+      </div>
+      {% else %}
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          {% for c in categories %}<option value="{{ c }}" {% if m.category == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+          {% if m.category and m.category not in categories %}<option value="{{ m.category }}" selected>{{ m.category }}</option>{% endif %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <div class="admin-radio-row">
+          <label><input type="radio" name="priority" value="standard" {% if m.priority != 'urgent' %}checked{% endif %}> Standard</label>
+          <label><input type="radio" name="priority" value="urgent" {% if m.priority == 'urgent' %}checked{% endif %}> Urgent (highlighted)</label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="body">{{ "Story" if kind == "stories" else "Announcement" }} text</label>
+      <textarea id="body" name="body">{{ item.body }}</textarea>
+    </div>
+
+    <div class="admin-edit-actions">
+      <a href="/admin" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> {{ "Publish" if is_new else "Save Changes" }}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/easymde@2.18.0/dist/easymde.min.js"></script>
+<script>
+  const mde = new EasyMDE({
+    element: document.getElementById('body'),
+    spellChecker: false,
+    status: false,
+    minHeight: '320px',
+    forceSync: true,
+    placeholder: 'Write here. Use the toolbar for bold, headings, lists and links.',
+    toolbar: ['bold', 'italic', 'heading-2', 'heading-3', '|', 'quote', 'unordered-list', 'ordered-list',
+              '|', 'link', 'horizontal-rule', '|', 'preview', 'side-by-side', '|', 'undo', 'redo', 'guide'],
+    previewRender: (text, preview) => {
+      const fd = new FormData();
+      fd.append('body', text);
+      fetch('/admin/preview', { method: 'POST', body: fd })
+        .then(r => r.json()).then(d => { preview.innerHTML = d.html || ''; });
+      return preview.innerHTML || 'Loading preview…';
+    },
+  });
+
+  // Warn before leaving with unsaved changes
+  let dirty = false;
+  const form = document.getElementById('editForm');
+  form.addEventListener('input', () => { dirty = true; });
+  mde.codemirror.on('change', () => { dirty = true; });
+  form.addEventListener('submit', () => { dirty = false; });
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+</script>
+{% endblock %}
+

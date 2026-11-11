@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Admin Sign In{% endblock %}
+{% block content %}
+<section class="container admin-section">
+  <div class="card admin-login-card">
+    <div class="admin-login-head">
+      <img src="/static/img/logo.png" alt="" class="admin-login-logo">
+      <h1>Ministry Admin</h1>
+      <p>Sign in to edit announcements and stories.</p>
+    </div>
+    {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
+    <form method="post" action="/admin/login" class="contact-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit"><i data-lucide="log-in"></i> Sign In</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+

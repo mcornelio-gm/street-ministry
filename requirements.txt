@@ -1,0 +1,13 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+jinja2>=3.1.4
+python-frontmatter>=1.1.0
+markdown>=3.6
+pyyaml>=6.0.1
+mkdocs>=1.6.0
+mkdocs-material>=9.5.0
+pymdown-extensions>=10.8.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.0
+itsdangerous>=2.1.0
+

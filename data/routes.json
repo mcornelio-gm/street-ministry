@@ -1,0 +1,123 @@
+[
+  {
+    "id": "fmt-01",
+    "name": "Peralta & Alameda Creek Trail",
+    "city": "Fremont",
+    "lat": 37.5625,
+    "lng": -121.9960,
+    "schedule": "Every Saturday, 8:00 AM",
+    "lead": "Dave & Sarah M.",
+    "target": "Creek encampments & pedestrian trail brush",
+    "description": "Foot patrol along the north and south banks of Alameda Creek. Focus on delivering hot breakfast burritos, fresh water, heavy tarps, and checking on seniors living in dome tents.",
+    "supplies_needed": ["Tarps (8x10)", "Hot coffee", "Breakfast packs", "Wool socks"]
+  },
+  {
+    "id": "fmt-02",
+    "name": "Warm Springs Vehicle Dwellers",
+    "city": "Fremont",
+    "lat": 37.5028,
+    "lng": -121.9400,
+    "schedule": "1st & 3rd Saturday, 9:30 AM",
+    "lead": "Carlos R.",
+    "target": "Cars, RVs, and vans in commuter park-and-rides",
+    "description": "Mobile outreach serving unhoused workers and families living in vehicles around South Fremont industrial streets. Provides gas vouchers, vehicle oil top-offs, dry pantry boxes, and hygiene kits.",
+    "supplies_needed": ["Gas cards ($25)", "Motor oil (5W-30)", "Gallon water jugs", "Dry shelf-stable food"]
+  },
+  {
+    "id": "fmt-03",
+    "name": "Centerville Train Station Corridor",
+    "city": "Fremont",
+    "lat": 37.5583,
+    "lng": -122.0075,
+    "schedule": "Every Wednesday, 6:00 PM",
+    "lead": "Michael C.",
+    "target": "Benches, alleyways, and storefront alcoves",
+    "description": "Evening hospitality walk around historic Centerville. Distribution of warm soup, clean blankets, and hygiene bags.",
+    "supplies_needed": ["Hot soup thermos", "Fleece blankets", "Hygiene packs (toothbrushes, soap, wipes)"]
+  },
+  {
+    "id": "nwk-01",
+    "name": "Cedar & Thornton Industrial Perimeter",
+    "city": "Newark",
+    "lat": 37.5310,
+    "lng": -122.0380,
+    "schedule": "2nd & 4th Saturday, 8:30 AM",
+    "lead": "Marcus T.",
+    "target": "Industrial cul-de-sacs and car camping zones",
+    "description": "Outreach to long-term vehicle residents along the salt marsh industrial edge. Checking in on safety, providing clean drinking water, dog food for companion animals, and trash disposal bags.",
+    "supplies_needed": ["Heavy duty trash bags", "Dog food (kibble)", "First aid kits", "Drinking water"]
+  },
+  {
+    "id": "nwk-02",
+    "name": "Newark Blvd Motel Corridor",
+    "city": "Newark",
+    "lat": 37.5250,
+    "lng": -122.0450,
+    "schedule": "Every Tuesday, 5:30 PM",
+    "lead": "Lydia C.",
+    "target": "Families and individuals in transient weekly motels",
+    "description": "Delivering fresh groceries, milk, fruit, and children's school supplies directly to weekly motel rooms. Supporting mothers with housing navigation referrals and prayer support.",
+    "supplies_needed": ["Fresh grocery bags", "Milk & cereal", "Kids school supplies", "Diapers (sizes 4-6)"]
+  },
+  {
+    "id": "uc-01",
+    "name": "Decoto Rail Spur & 11th Street",
+    "city": "Union City",
+    "lat": 37.5950,
+    "lng": -122.0210,
+    "schedule": "Every Saturday, 8:15 AM",
+    "lead": "Pastor Dave",
+    "target": "Rail easements, converted vans, and wooded pockets",
+    "description": "Close-knit outreach group walking the historic rail line and surrounding wooded easements. Building multi-month relationships with long-term unhoused neighbors.",
+    "supplies_needed": ["Hot breakfast sandwiches", "Batteries (AA/AAA)", "Hand warmers", "Ponchos"]
+  },
+  {
+    "id": "uc-02",
+    "name": "Alvarado-Niles Transit Buffer",
+    "city": "Union City",
+    "lat": 37.5910,
+    "lng": -122.0175,
+    "schedule": "Thursday Evenings, 6:30 PM",
+    "lead": "Rachel H.",
+    "target": "Bus depots, park benches, and commercial buffers",
+    "description": "Evening presence connecting with folks waiting near public transit hubs. Distributing warm cider, socks, and Alameda County resource pamphlets.",
+    "supplies_needed": ["Warm cider/tea", "Wool socks", "Resource brochures", "Lip balm"]
+  },
+  {
+    "id": "hyw-01",
+    "name": "Mission Blvd & A Street Corridor",
+    "city": "Hayward",
+    "lat": 37.6740,
+    "lng": -122.0830,
+    "schedule": "Every Saturday, 8:45 AM",
+    "lead": "Deacon James",
+    "target": "Sidewalk camps, alleyways, and motel steps",
+    "description": "Active walking route in downtown Hayward. Engaging folks along Mission Blvd with hearty bagged lunches, fresh underwear/socks, and connecting with South Hayward Parish shelter programs.",
+    "supplies_needed": ["Bagged lunches", "Underwear (M/L/XL)", "Winter beanies", "Water bottles"]
+  },
+  {
+    "id": "hyw-02",
+    "name": "San Lorenzo Creek Greenway",
+    "city": "Hayward",
+    "lat": 37.6715,
+    "lng": -122.0780,
+    "schedule": "1st & 3rd Sunday, 7:30 AM",
+    "lead": "Outreach Team 4",
+    "target": "Dry creek beds, bridge overpasses, and willow groves",
+    "description": "Pancake breakfast hospitality table set up beneath the Foothill Blvd bridge. A safe, welcoming morning space for prayer, hot food, and community fellowship.",
+    "supplies_needed": ["Pancake mix & syrup", "Propane cylinders", "Folding camp chairs", "Hygiene kits"]
+  },
+  {
+    "id": "hyw-03",
+    "name": "Industrial Blvd Parking Buffer",
+    "city": "Hayward",
+    "lat": 37.6480,
+    "lng": -122.0950,
+    "schedule": "Saturday Afternoons, 1:00 PM",
+    "lead": "Carlos R.",
+    "target": "Commercial roadside vehicle encampments",
+    "description": "Checking in on vehicle residents parked along long warehouse curbs. Fire extinguisher safety checks, battery charging help, and care packages.",
+    "supplies_needed": ["Jumper cables/battery packs", "Dry goods", "Gallon water", "Blankets"]
+  }
+]
+

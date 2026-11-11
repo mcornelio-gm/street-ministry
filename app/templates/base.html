@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Resonate Church Street Ministry{% endblock %} | Fremont • Newark • Union City • Hayward</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/static/img/logo.png">
+
+  <!-- Inter & Plus Jakarta Sans Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons (Vanilla JS / CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS for Maps -->
+  {% block extra_head %}{% endblock %}
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="site-header">
+    <div class="header-inner container">
+      <a href="/" class="brand-link">
+        <img src="/static/img/logo.png" alt="Resonate Church Logo" class="brand-logo" />
+        <div class="brand-text">
+          <span class="brand-church">Resonate Church</span>
+          <span class="brand-ministry">Street Ministry</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav class="nav-tabs" aria-label="Main Navigation">
+        <a href="/" class="nav-tab {% if active_tab == 'welcome' %}active{% endif %}">
+          <i data-lucide="home"></i>
+          <span>Welcome</span>
+        </a>
+        <a href="/documents/" class="nav-tab {% if active_tab == 'documents' %}active{% endif %}">
+          <i data-lucide="book-open"></i>
+          <span>Documents</span>
+        </a>
+        <a href="/stories" class="nav-tab {% if active_tab == 'stories' %}active{% endif %}">
+          <i data-lucide="heart-handshake"></i>
+          <span>Stories</span>
+        </a>
+        <a href="/routes" class="nav-tab {% if active_tab == 'routes' %}active{% endif %}">
+          <i data-lucide="map-pin"></i>
+          <span>Routes</span>
+        </a>
+        <a href="/about" class="nav-tab {% if active_tab == 'about' %}active{% endif %}">
+          <i data-lucide="info"></i>
+          <span>About</span>
+        </a>
+      </nav>
+
+      <!-- Action Button & Mobile Toggle -->
+      <div class="header-actions">
+        <a href="/about#volunteer" class="btn btn-primary btn-sm">
+          <i data-lucide="sparkles"></i>
+          <span>Join a Route</span>
+        </a>
+        <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <nav class="mobile-nav-links">
+        <a href="/" class="mobile-nav-link {% if active_tab == 'welcome' %}active{% endif %}">
+          <i data-lucide="home"></i>
+          <span>Welcome</span>
+        </a>
+        <a href="/documents/" class="mobile-nav-link {% if active_tab == 'documents' %}active{% endif %}">
+          <i data-lucide="book-open"></i>
+          <span>Documents (Wiki)</span>
+        </a>
+        <a href="/stories" class="mobile-nav-link {% if active_tab == 'stories' %}active{% endif %}">
+          <i data-lucide="heart-handshake"></i>
+          <span>Stories</span>
+        </a>
+        <a href="/routes" class="mobile-nav-link {% if active_tab == 'routes' %}active{% endif %}">
+          <i data-lucide="map-pin"></i>
+          <span>Routes & Map</span>
+        </a>
+        <a href="/about" class="mobile-nav-link {% if active_tab == 'about' %}active{% endif %}">
+          <i data-lucide="info"></i>
+          <span>About & Contact</span>
+        </a>
+      </nav>
+      <div class="mobile-menu-footer">
+        <p class="tagline">Serving our unhoused neighbors in Fremont, Newark, Union City & Hayward.</p>
+        <a href="/about#volunteer" class="btn btn-primary btn-block">Sign Up to Volunteer</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-col brand-col">
+        <div class="footer-logo">
+          <img src="/static/img/logo.png" alt="Resonate Church Logo" />
+          <div>
+            <h3>Resonate Church</h3>
+            <span class="sub">Street Ministry Team</span>
+          </div>
+        </div>
+        <p class="footer-desc">
+          Stepping outside the walls to love, serve, and walk alongside our unhoused neighbors living in streets, bushes, creek banks, vehicles, and motels across the East Bay.
+        </p>
+        <div class="verse-box">
+          <p>"Truly I tell you, whatever you did for one of the least of these brothers and sisters of mine, you did for me."</p>
+          <cite>— Matthew 25:40</cite>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="/"><i data-lucide="chevron-right"></i> Welcome & Announcements</a></li>
+          <li><a href="/documents/"><i data-lucide="chevron-right"></i> Searchable Documents</a></li>
+          <li><a href="/stories"><i data-lucide="chevron-right"></i> Stories & Testimonies</a></li>
+          <li><a href="/routes"><i data-lucide="chevron-right"></i> Routes & Interactive Map</a></li>
+          <li><a href="/about"><i data-lucide="chevron-right"></i> About Our Ministry</a></li>
+          <li><a href="/about#donate"><i data-lucide="chevron-right"></i> Immediate Donation Needs</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Communities Served</h4>
+        <ul class="city-tags">
+          <li><span class="badge-city">Fremont</span></li>
+          <li><span class="badge-city">Newark</span></li>
+          <li><span class="badge-city">Union City</span></li>
+          <li><span class="badge-city">Hayward</span></li>
+        </ul>
+        <div class="helpline-card">
+          <div class="helpline-icon"><i data-lucide="phone-call"></i></div>
+          <div class="helpline-text">
+            <strong>Alameda County 2-1-1</strong>
+            <span>24/7 Coordinated Entry & Emergency Shelter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <p>&copy; 2026 Resonate Church Street Ministry. All rights reserved.</p>
+      <p class="gcp-tag">Hosted with care on Google Cloud · <a href="/admin" class="admin-footer-link">Admin</a></p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Mobile menu toggle
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (mobileBtn && mobileMenu) {
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('open');
+      });
+    }
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

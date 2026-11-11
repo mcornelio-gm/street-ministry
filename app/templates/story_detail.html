@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ story.title }} | Street Ministry Stories{% endblock %}
+
+{% block content %}
+<article class="story-detail-article">
+  <div class="container container-sm">
+    <nav class="breadcrumb-nav">
+      <a href="/"><i data-lucide="home"></i> Home</a>
+      <span class="sep">/</span>
+      <a href="/stories">Stories</a>
+      <span class="sep">/</span>
+      <span class="current">{{ story.title }}</span>
+    </nav>
+
+    <header class="story-detail-header">
+      <div class="story-meta-row">
+        <span class="city-pill city-{{ story.city|lower|replace(' ', '-') }}">
+          <i data-lucide="map-pin"></i> {{ story.city }}
+        </span>
+        <span class="story-date">
+          <i data-lucide="calendar"></i> {{ story.date_display }}
+        </span>
+        <span class="story-read-time">
+          <i data-lucide="clock"></i> {{ story.read_time_min }} min read
+        </span>
+      </div>
+
+      <h1 class="story-detail-title">{{ story.title }}</h1>
+
+      <div class="author-byline">
+        <div class="byline-avatar">
+          <i data-lucide="user"></i>
+        </div>
+        <div class="byline-info">
+          <span class="byline-name">{{ story.author }}</span>
+          <span class="byline-role">Resonate Outreach Team</span>
+        </div>
+      </div>
+    </header>
+
+    {% if story.summary %}
+    <div class="story-excerpt-callout">
+      <p>{{ story.summary }}</p>
+    </div>
+    {% endif %}
+
+    <div class="story-detail-body markdown-body">
+      {{ story.html | safe }}
+    </div>
+
+    <footer class="story-detail-footer">
+      <div class="story-tags">
+        {% for tag in story.tags %}
+        <span class="tag-pill">#{{ tag }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="detail-actions">
+        <a href="/stories" class="btn btn-outline">
+          <i data-lucide="arrow-left"></i>
+          <span>Back to All Stories</span>
+        </a>
+        <a href="/documents/Stories/{{ story.slug }}/" class="btn btn-ghost" title="View in MkDocs repository">
+          <i data-lucide="file-code"></i>
+          <span>View in Documents Wiki</span>
+        </a>
+      </div>
+    </footer>
+  </div>
+</article>
+{% endblock %}
+

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<section class="container admin-section">
+  <div class="admin-topbar">
+    <div>
+      <h1>Ministry Admin</h1>
+      <p class="admin-muted">Signed in as <strong>{{ admin_user }}</strong>. Changes go live within a few seconds.</p>
+    </div>
+    <form method="post" action="/admin/logout">
+      <button class="btn btn-ghost btn-sm" type="submit"><i data-lucide="log-out"></i> Sign Out</button>
+    </form>
+  </div>
+
+  {% if flash %}<div class="admin-alert admin-alert-ok"><i data-lucide="check-circle"></i> {{ flash }}</div>{% endif %}
+
+  {% for kind, label, items, url in [
+      ("announcements", "Announcements", announcements, "/"),
+      ("stories", "Stories", stories, "/stories")] %}
+  <div class="card admin-list-card">
+    <div class="admin-list-head">
+      <h2>{{ label }} <span class="badge badge-teal">{{ items|length }}</span></h2>
+      <div class="admin-list-actions">
+        <a href="{{ url }}" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="eye"></i> View on site</a>
+        <a href="/admin/{{ kind }}/new" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> New {{ label[:-1] if kind == 'announcements' else 'Story' }}</a>
+      </div>
+    </div>
+    <table class="routes-table admin-table">
+      <thead><tr><th>Date</th><th>Title</th><th>{{ "City" if kind == "stories" else "Priority" }}</th><th>Author</th><th></th></tr></thead>
+      <tbody>
+        {% for it in items %}
+        <tr>
+          <td class="text-nowrap">{{ it.date }}</td>
+          <td><a href="/admin/{{ kind }}/{{ it.slug }}"><strong>{{ it.title }}</strong></a></td>
+          <td>
+            {% if kind == "stories" %}<span class="city-pill city-{{ it.city|lower|replace(' ', '-') }}">{{ it.city }}</span>
+            {% elif it.priority == "urgent" %}<span class="announcement-urgent-badge">Urgent</span>
+            {% else %}<span class="admin-muted">Standard</span>{% endif %}
+          </td>
+          <td class="admin-muted">{{ it.author }}</td>
+          <td class="text-nowrap admin-row-actions">
+            <a href="/admin/{{ kind }}/{{ it.slug }}" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</a>
+            <form method="post" action="/admin/{{ kind }}/{{ it.slug }}/delete"
+                  onsubmit='return confirm({{ ("Delete “" ~ it.title ~ "”? This removes it from the site.")|tojson }});'>
+              <button class="btn btn-ghost btn-sm admin-delete" type="submit" title="Delete"><i data-lucide="trash-2"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="admin-muted">Nothing here yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

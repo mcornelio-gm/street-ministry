@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Stories from the Street | Resonate Church Street Ministry{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+  <div class="container">
+    <div class="page-header-content">
+      <div class="header-pill">
+        <i data-lucide="heart-handshake"></i>
+        <span>Documents/Stories</span>
+      </div>
+      <h1 class="page-title">Stories from the Street</h1>
+      <p class="page-subtitle">
+        Real encounters, answered prayers, and moments of mutual transformation from the sidewalks, motels, creek beds, and vehicle encampments of <strong>Fremont, Newark, Union City, and Hayward</strong>.
+      </p>
+    </div>
+
+    <!-- Filter Buttons by City -->
+    <div class="filter-bar">
+      <div class="filter-label">
+        <i data-lucide="filter"></i> Filter by City:
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-city="all">All Cities ({{ stories|length }})</button>
+        <button class="filter-btn" data-city="Fremont">Fremont</button>
+        <button class="filter-btn" data-city="Newark">Newark</button>
+        <button class="filter-btn" data-city="Union City">Union City</button>
+        <button class="filter-btn" data-city="Hayward">Hayward</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container content-section">
+  <div class="stories-grid" id="storiesGrid">
+    {% for story in stories %}
+    <article class="story-card" data-city="{{ story.city }}">
+      <div class="story-card-top">
+        <div class="story-meta-row">
+          <span class="city-pill city-{{ story.city|lower|replace(' ', '-') }}">
+            <i data-lucide="map-pin"></i> {{ story.city }}
+          </span>
+          <span class="story-date">
+            <i data-lucide="calendar"></i> {{ story.date_display }}
+          </span>
+          <span class="story-read-time">
+            <i data-lucide="clock"></i> {{ story.read_time_min }} min read
+          </span>
+        </div>
+        <h2 class="story-title">
+          <a href="/stories/{{ story.slug }}">{{ story.title }}</a>
+        </h2>
+      </div>
+
+      <div class="story-card-body">
+        <p class="story-summary">{{ story.summary }}</p>
+      </div>
+
+      <div class="story-card-footer">
+        <div class="story-tags">
+          {% for tag in story.tags %}
+          <span class="tag-pill">#{{ tag }}</span>
+          {% endfor %}
+        </div>
+        <div class="story-actions">
+          <span class="story-author"><i data-lucide="user"></i> {{ story.author }}</span>
+          <a href="/stories/{{ story.slug }}" class="btn btn-outline btn-sm">
+            <span>Read Story</span>
+            <i data-lucide="arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+      <i data-lucide="book-open"></i>
+      <p>No stories found. Add new markdown files into <code>Documents/Stories/</code>.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // City Filtering logic
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const storyCards = document.querySelectorAll('.story-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const targetCity = btn.getAttribute('data-city');
+      storyCards.forEach(card => {
+        const cardCity = card.getAttribute('data-city');
+        if (targetCity === 'all' || cardCity === targetCity) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+

@@ -1,0 +1,54 @@
+site_name: Resonate Church Street Ministry
+site_description: Documentation, guidelines, route protocols, and resources for Resonate Church Street Ministry serving Fremont, Newark, Union City, and Hayward.
+site_author: Resonate Church Street Ministry
+docs_dir: Documents
+site_dir: site/documents
+
+theme:
+  name: material
+  custom_dir: theme_overrides
+  logo: /static/img/logo.png
+  favicon: /static/img/logo.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - toc.integrate
+    - content.code.copy
+
+plugins:
+  - search
+
+hooks:
+  - hooks.py
+
+markdown_extensions:
+  - attr_list
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+  - stylesheets/extra.css
+

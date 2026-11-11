@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Outreach Routes & Interactive Map | Resonate Church Street Ministry{% endblock %}
+
+{% block extra_head %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+  <div class="container">
+    <div class="page-header-content">
+      <div class="header-pill">
+        <i data-lucide="map-pin"></i>
+        <span>Active Field Operations</span>
+      </div>
+      <h1 class="page-title">Outreach Routes & Field Map</h1>
+      <p class="page-subtitle">
+        Weekly scheduled routes serving our unhoused neighbors across <strong>Fremont, Newark, Union City, and Hayward</strong>. Filter by city or click any pin on the map to view route details.
+      </p>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="routes-toolbar">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-city="all">All Sectors ({{ routes|length }})</button>
+        <button class="filter-btn" data-city="Fremont">Fremont</button>
+        <button class="filter-btn" data-city="Newark">Newark</button>
+        <button class="filter-btn" data-city="Union City">Union City</button>
+        <button class="filter-btn" data-city="Hayward">Hayward</button>
+      </div>
+
+      <div class="routes-search-box">
+        <i data-lucide="search"></i>
+        <input type="text" id="routeSearchInput" placeholder="Search route, stop, or lead..." />
+      </div>
+
+      <div class="view-toggles">
+        <button class="toggle-btn active" id="btnViewBoth" title="Map & Table View"><i data-lucide="layout"></i> Split</button>
+        <button class="toggle-btn" id="btnViewMap" title="Map Focus"><i data-lucide="map"></i> Map</button>
+        <button class="toggle-btn" id="btnViewTable" title="Table Focus"><i data-lucide="table"></i> Table</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container content-section">
+  <div class="routes-layout" id="routesLayout">
+
+    <!-- Interactive Leaflet Map Container -->
+    <div class="map-wrapper card" id="mapWrapper">
+      <div class="map-card-header">
+        <div class="map-header-title">
+          <i data-lucide="map"></i>
+          <span>East Bay Outreach Map</span>
+        </div>
+        <div class="map-legend">
+          <span class="legend-dot fmt"></span> Fremont
+          <span class="legend-dot nwk"></span> Newark
+          <span class="legend-dot uc"></span> Union City
+          <span class="legend-dot hyw"></span> Hayward
+        </div>
+      </div>
+      <div id="outreachMap" style="height: 520px; width: 100%;"></div>
+      <div class="map-footer-tip">
+        <i data-lucide="info"></i>
+        <span>Click on any pin to view route stops, schedule, and navigation coordinates.</span>
+      </div>
+    </div>
+
+    <!-- Table View Container -->
+    <div class="table-wrapper card" id="tableWrapper">
+      <div class="table-card-header">
+        <div class="table-header-title">
+          <i data-lucide="list"></i>
+          <span>Routes Directory</span>
+        </div>
+        <span class="badge badge-teal" id="routeCountBadge">{{ routes|length }} Active Routes</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="routes-table" id="routesTable">
+          <thead>
+            <tr>
+              <th>City</th>
+              <th>Route Name & Focus</th>
+              <th>Schedule</th>
+              <th>Team Lead</th>
+              <th>Description & Key Supplies</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in routes %}
+            <tr class="route-row" data-city="{{ r.city }}" data-id="{{ r.id }}" data-lat="{{ r.lat }}" data-lng="{{ r.lng }}">
+              <td>
+                <span class="city-pill city-{{ r.city|lower|replace(' ', '-') }}">
+                  {{ r.city }}
+                </span>
+              </td>
+              <td>
+                <div class="route-name-cell">
+                  <strong>{{ r.name }}</strong>
+                  <span class="route-target"><i data-lucide="target"></i> {{ r.target }}</span>
+                </div>
+              </td>
+              <td class="text-nowrap">
+                <span class="schedule-pill">
+                  <i data-lucide="clock"></i> {{ r.schedule }}
+                </span>
+              </td>
+              <td class="text-nowrap">
+                <span class="lead-pill">
+                  <i data-lucide="user"></i> {{ r.lead }}
+                </span>
+              </td>
+              <td>
+                <p class="route-desc">{{ r.description }}</p>
+                <div class="supplies-tags">
+                  {% for item in r.supplies_needed %}
+                  <span class="supply-tag"><i data-lucide="check"></i> {{ item }}</span>
+                  {% endfor %}
+                </div>
+              </td>
+              <td class="text-nowrap">
+                <button class="btn btn-sm btn-outline btn-locate" data-lat="{{ r.lat }}" data-lng="{{ r.lng }}" title="Locate on Map">
+                  <i data-lucide="crosshair"></i>
+                  <span>Pin</span>
+                </button>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ r.lat }},{{ r.lng }}" target="_blank" rel="noopener" class="btn btn-sm btn-ghost" title="Directions">
+                  <i data-lucide="navigation"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+  // Routes data serialized from server
+  const routesData = {{ routes | tojson }};
+
+  // Initialize Leaflet Map centered on Tri-City / Hayward area
+  // Coordinates approx center: 37.58, -122.02
+  const map = L.map('outreachMap').setView([37.585, -122.025], 11);
+
+  // OpenStreetMap Tile Layer (Clean CartoDB Positron or OSM)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // City color mapper
+  const cityColors = {
+    'Fremont': '#10b981',    // Emerald
+    'Newark': '#06b6d4',     // Cyan
+    'Union City': '#8b5cf6', // Violet
+    'Hayward': '#f59e0b'     // Amber
+  };
+
+  const markers = [];
+
+  // Add markers for all routes
+  routesData.forEach(route => {
+    const color = cityColors[route.city] || '#22937e';
+
+    // Custom circular SVG icon
+    const iconHtml = `
+      <div style="
+        background-color: ${color};
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 3px solid #ffffff;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 13px;
+      ">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+    `;
+
+    const customIcon = L.divIcon({
+      html: iconHtml,
+      className: 'custom-map-pin',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
+    const popupContent = `
+      <div class="map-popup-card">
+        <div class="popup-city" style="color: ${color}; font-weight: 700; text-transform: uppercase; font-size: 11px;">
+          ${route.city}
+        </div>
+        <h4 style="margin: 3px 0 6px; font-size: 15px; color: #0f172a;">${route.name}</h4>
+        <div style="font-size: 12px; color: #475569; margin-bottom: 6px;">
+          <strong>Schedule:</strong> ${route.schedule}<br>
+          <strong>Team Lead:</strong> ${route.lead}
+        </div>
+        <p style="font-size: 12px; color: #334155; margin: 0 0 8px; line-height: 1.4;">${route.description}</p>
+        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; color: #64748b;">Target: ${route.target}</span>
+          <a href="https://www.google.com/maps/search/?api=1&query=${route.lat},${route.lng}" target="_blank" style="display: inline-block; background: #22937e; color: #fff; padding: 3px 8px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: 600;">Directions &rarr;</a>
+        </div>
+      </div>
+    `;
+
+    const marker = L.marker([route.lat, route.lng], { icon: customIcon }).addTo(map);
+    marker.bindPopup(popupContent);
+    marker.routeData = route;
+    markers.push(marker);
+  });
+
+  // Filter functionality
+  const filterBtns = document.querySelectorAll('.routes-toolbar .filter-btn');
+  const tableRows = document.querySelectorAll('.routes-table tbody tr');
+  const searchInput = document.getElementById('routeSearchInput');
+  const countBadge = document.getElementById('routeCountBadge');
+
+  function applyFilters() {
+    const activeBtn = document.querySelector('.routes-toolbar .filter-btn.active');
+    const selectedCity = activeBtn ? activeBtn.getAttribute('data-city') : 'all';
+    const searchQuery = searchInput.value.toLowerCase().trim();
+
+    let visibleCount = 0;
+
+    tableRows.forEach(row => {
+      const rowCity = row.getAttribute('data-city');
+      const rowText = row.innerText.toLowerCase();
+
+      const cityMatch = (selectedCity === 'all' || rowCity === selectedCity);
+      const searchMatch = !searchQuery || rowText.includes(searchQuery);
+
+      if (cityMatch && searchMatch) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // Also filter map markers
+    markers.forEach(marker => {
+      const markerCity = marker.routeData.city;
+      const markerText = (marker.routeData.name + " " + marker.routeData.description + " " + marker.routeData.lead).toLowerCase();
+
+      const cityMatch = (selectedCity === 'all' || markerCity === selectedCity);
+      const searchMatch = !searchQuery || markerText.includes(searchQuery);
+
+      if (cityMatch && searchMatch) {
+        if (!map.hasLayer(marker)) map.addLayer(marker);
+      } else {
+        if (map.hasLayer(marker)) map.removeLayer(marker);
+      }
+    });
+
+    if (countBadge) {
+      countBadge.innerText = `${visibleCount} Routes Shown`;
+    }
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    });
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  // Locate button in table rows to pan map
+  document.querySelectorAll('.btn-locate').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const lat = parseFloat(btn.getAttribute('data-lat'));
+      const lng = parseFloat(btn.getAttribute('data-lng'));
+      map.flyTo([lat, lng], 14, { duration: 1.2 });
+
+      // Find marker and open popup
+      const targetMarker = markers.find(m => m.routeData.lat === lat && m.routeData.lng === lng);
+      if (targetMarker) {
+        targetMarker.openPopup();
+      }
+    });
+  });
+
+  // View toggle buttons
+  const btnViewBoth = document.getElementById('btnViewBoth');
+  const btnViewMap = document.getElementById('btnViewMap');
+  const btnViewTable = document.getElementById('btnViewTable');
+  const mapWrapper = document.getElementById('mapWrapper');
+  const tableWrapper = document.getElementById('tableWrapper');
+
+  function setView(mode) {
+    [btnViewBoth, btnViewMap, btnViewTable].forEach(b => b.classList.remove('active'));
+    if (mode === 'both') {
+      btnViewBoth.classList.add('active');
+      mapWrapper.style.display = 'block';
+      tableWrapper.style.display = 'block';
+      mapWrapper.style.width = '';
+      tableWrapper.style.width = '';
+    } else if (mode === 'map') {
+      btnViewMap.classList.add('active');
+      mapWrapper.style.display = 'block';
+      tableWrapper.style.display = 'none';
+    } else if (mode === 'table') {
+      btnViewTable.classList.add('active');
+      mapWrapper.style.display = 'none';
+      tableWrapper.style.display = 'block';
+    }
+    setTimeout(() => { map.invalidateSize(); }, 200);
+  }
+
+  btnViewBoth.addEventListener('click', () => setView('both'));
+  btnViewMap.addEventListener('click', () => setView('map'));
+  btnViewTable.addEventListener('click', () => setView('table'));
+</script>
+{% endblock %}
+
