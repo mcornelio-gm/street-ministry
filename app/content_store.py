@@ -1,7 +1,7 @@
-"""Read/write/delete editable content (Announcements and Stories).
+"""Read/write/delete editable content (Announcements, Stories, Guides).
 
 On Cloud Run, CONTENT_MOUNT points at a Cloud Storage bucket volume. At startup,
-Documents/Announcements and Documents/Stories are replaced by symlinks into that
+each editable folder under Documents/ is replaced by a symlink into that
 bucket (seeding it from the image the first time), so edits persist across
 restarts and deploys. Locally, files are edited in place under Documents/.
 """
@@ -15,8 +15,9 @@ import frontmatter
 from app.md_engine import DOCUMENTS_DIR
 
 KINDS = {
-    "announcements": {"folder": "Announcements", "label": "Announcement"},
-    "stories": {"folder": "Stories", "label": "Story"},
+    "announcements": {"folder": "Announcements", "label": "Announcement", "plural": "Announcements"},
+    "stories": {"folder": "Stories", "label": "Story", "plural": "Stories"},
+    "guides": {"folder": "Guides", "label": "Guide", "plural": "Guides"},
 }
 CITIES = ["Fremont", "Newark", "Union City", "Hayward"]
 ANNOUNCEMENT_CATEGORIES = ["General", "Supplies & Donations", "Route Logistics", "Training", "Events"]
@@ -93,6 +94,8 @@ def list_items(kind: str) -> list[dict]:
             "author": post.metadata.get("author", ""),
         })
     items.sort(key=lambda x: (x["date"], x["slug"]), reverse=True)
+    if kind == "guides":
+        items.sort(key=lambda x: x["title"].lower())
     return items
 
 
@@ -134,6 +137,8 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         meta["city"] = city
         meta["tags"] = [t.strip() for t in (form.get("tags") or "").split(",") if t.strip()]
         meta["summary"] = (form.get("summary") or "").strip()
+    elif kind == "guides":
+        meta["summary"] = (form.get("summary") or "").strip()
     else:
         category = (form.get("category") or "General").strip()
         meta["category"] = category or "General"
@@ -141,7 +146,8 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         meta["priority"] = priority if priority in PRIORITIES else "standard"
 
     if slug is None:
-        base = f"{d.isoformat()}-{slugify(title)}"
+        # Guides are reference pages, so no date prefix (stable URLs like /guides/volunteer-guide)
+        base = slugify(title) if kind == "guides" else f"{d.isoformat()}-{slugify(title)}"
         slug, n = base, 2
         while os.path.exists(_path(kind, slug)):
             slug, n = f"{base}-{n}", n + 1

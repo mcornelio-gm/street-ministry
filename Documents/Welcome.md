@@ -30,7 +30,7 @@ Our mission is simple and unwavering:
 Whether you can pack lunches on Friday night, ride along on a Saturday morning outreach route, donate critical winter gear, or commit to regular prayer for our neighbors, there is a place for you on the team.
 
 * Check out our **[Routes](/routes)** to see where our teams deploy each weekend.
-* Read the **[Volunteer Guidelines](/documents/Volunteer_Guide/)** before your first ride-along.
+* Read the **[Volunteer Orientation & Safety Briefing](/guides/volunteer-guide)** before your first ride-along.
 * Be inspired by reading recent **[Stories](/stories)** from the field.
 * Have questions or wish to donate? Head over to **[About & Contact](/about)**.
 

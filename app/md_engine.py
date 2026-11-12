@@ -10,18 +10,33 @@ import markdown
 DOCUMENTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Documents"))
 SITE_DOCS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "site", "documents"))
 
+def _mermaid_fence(source, language, css_class, options, md, **kwargs):
+    """Render ```mermaid fences as <pre class="mermaid"> for mermaid.js."""
+    import html
+    return f'<pre class="mermaid">{html.escape(source)}</pre>'
+
+
 MD_EXTENSIONS = [
-    "extra",
-    "admonition",
+    "abbr",
+    "attr_list",
+    "def_list",
+    "footnotes",
+    "md_in_html",
     "tables",
+    "admonition",
     "toc",
-    "codehilite",
+    "pymdownx.superfences",
 ]
+MD_EXTENSION_CONFIGS = {
+    "pymdownx.superfences": {
+        "custom_fences": [{"name": "mermaid", "class": "mermaid", "format": _mermaid_fence}]
+    }
+}
 
 
 def render_markdown(text: str) -> str:
     """Render markdown string to HTML with standard extensions."""
-    return markdown.markdown(text, extensions=MD_EXTENSIONS)
+    return markdown.markdown(text, extensions=MD_EXTENSIONS, extension_configs=MD_EXTENSION_CONFIGS)
 
 
 def get_welcome_doc() -> dict:
@@ -167,6 +182,51 @@ def get_story_by_slug(slug: str) -> dict | None:
     for s in stories:
         if s["slug"] == slug:
             return s
+    return None
+
+
+def get_guides() -> list:
+    """Read all guides from Documents/Guides, sorted by title."""
+    guides_dir = os.path.join(DOCUMENTS_DIR, "Guides")
+    guides = []
+    for file_path in glob.glob(os.path.join(guides_dir, "*.md")):
+        filename = os.path.basename(file_path)
+        if filename.lower() == "index.md":
+            continue
+        try:
+            post = frontmatter.load(file_path)
+            raw_date = post.metadata.get("date")
+            if isinstance(raw_date, (datetime, date)):
+                display_date = raw_date.strftime("%B %d, %Y")
+            elif raw_date:
+                try:
+                    display_date = datetime.strptime(str(raw_date)[:10], "%Y-%m-%d").strftime("%B %d, %Y")
+                except ValueError:
+                    display_date = str(raw_date)
+            else:
+                display_date = ""
+            slug = os.path.splitext(filename)[0]
+            word_count = len(post.content.split())
+            guides.append({
+                "slug": slug,
+                "filename": filename,
+                "title": post.metadata.get("title", slug.replace("-", " ").title()),
+                "date_display": display_date,
+                "author": post.metadata.get("author", ""),
+                "summary": post.metadata.get("summary", ""),
+                "read_time_min": max(1, round(word_count / 180)),
+                "html": render_markdown(post.content),
+            })
+        except Exception as e:
+            print(f"Error parsing guide {file_path}: {e}")
+    guides.sort(key=lambda g: g["title"].lower())
+    return guides
+
+
+def get_guide_by_slug(slug: str) -> dict | None:
+    for g in get_guides():
+        if g["slug"] == slug:
+            return g
     return None
 
 

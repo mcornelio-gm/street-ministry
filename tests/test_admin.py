@@ -49,9 +49,10 @@ def test_dashboard_lists_content_but_not_index(client):
     assert login(client).status_code == 303
     r = client.get("/admin")
     assert r.status_code == 200
-    assert "A Full Song with Some Difficult Notes" in r.text
-    assert "Urgent Need: Winter Tarps" in r.text
-    assert "/admin/stories/index" not in r.text
+    for kind in ("announcements", "stories", "guides"):
+        for it in content_store.list_items(kind):
+            assert f"/admin/{kind}/{it['slug']}" in r.text
+        assert f"/admin/{kind}/index" not in r.text
 
 
 def test_path_traversal_rejected(client):
@@ -104,6 +105,27 @@ def test_story_create_edit_delete(client):
             content_store.delete_item("stories", slug)
 
 
+def test_guide_create_edit_delete(client):
+    login(client)
+    form = {"title": "Zz Test Guide", "date": "2026-11-12", "author": "Tester",
+            "summary": "How to test.", "body": "Step **one**.\n\n```mermaid\nflowchart TD\n  A --> B\n```"}
+    slug = "zz-test-guide"  # guides have no date prefix
+    try:
+        r = client.post("/admin/guides/save", data=form, follow_redirects=False)
+        assert r.status_code == 303
+        assert "Zz Test Guide" in client.get("/admin").text
+        page = client.get(f"/guides/{slug}")
+        assert page.status_code == 200 and '<pre class="mermaid">' in page.text
+        assert client.get(f"/documents/Guides/{slug}/").status_code == 200
+        client.post("/admin/guides/save", data={**form, "slug": slug, "summary": "Edited."})
+        assert content_store.load_item("guides", slug)["meta"]["summary"] == "Edited."
+        client.post(f"/admin/guides/{slug}/delete")
+        assert client.get(f"/guides/{slug}").status_code == 404
+    finally:
+        if os.path.exists(content_store._path("guides", slug)):
+            content_store.delete_item("guides", slug)
+
+
 def test_announcement_create_and_delete(client):
     login(client)
     form = {"title": "Zz Test Announcement", "date": "2030-01-01", "author": "Tester",
@@ -115,7 +137,11 @@ def test_announcement_create_and_delete(client):
         assert item["meta"]["priority"] == "urgent"
         assert item["body"] == "Bring gloves."  # leading '# Title' stripped
         home = client.get("/").text
-        assert home.index("Zz Test Announcement") < home.index("Urgent Need: Winter Tarps")
+        assert "Zz Test Announcement" in home
+        # Dated 2030, so it must be listed before every real announcement
+        others = [a for a in content_store.list_items("announcements") if a["slug"] != slug]
+        for a in others:
+            assert home.index("Zz Test Announcement") < home.index(a["title"].replace("&", "&amp;"))
     finally:
         if os.path.exists(content_store._path("announcements", slug)):
             client.post(f"/admin/announcements/{slug}/delete")

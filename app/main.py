@@ -95,6 +95,23 @@ async def story_detail(request: Request, slug: str):
     )
 
 
+@app.get("/guides", response_class=HTMLResponse)
+async def guides(request: Request):
+    return templates.TemplateResponse(
+        request, "guides.html", {"active_tab": "guides", "guides": md_engine.get_guides()}
+    )
+
+
+@app.get("/guides/{slug}", response_class=HTMLResponse)
+async def guide_detail(request: Request, slug: str):
+    guide = md_engine.get_guide_by_slug(slug)
+    if not guide:
+        raise HTTPException(status_code=404, detail="Guide not found")
+    return templates.TemplateResponse(
+        request, "guide_detail.html", {"active_tab": "guides", "guide": guide}
+    )
+
+
 @app.get("/routes", response_class=HTMLResponse)
 async def routes(request: Request):
     return templates.TemplateResponse(

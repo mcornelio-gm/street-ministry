@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ guide.title }} | Guides{% endblock %}
+
+{% block content %}
+<article class="story-detail-article">
+  <div class="container container-sm">
+    <nav class="breadcrumb-nav">
+      <a href="/"><i data-lucide="home"></i> Home</a>
+      <span class="sep">/</span>
+      <a href="/guides">Guides</a>
+      <span class="sep">/</span>
+      <span class="current">{{ guide.title }}</span>
+    </nav>
+
+    <header class="story-detail-header">
+      <div class="story-meta-row">
+        <span class="guide-pill"><i data-lucide="book-open-check"></i> Guide</span>
+        {% if guide.date_display %}<span class="story-date"><i data-lucide="calendar"></i> Updated {{ guide.date_display }}</span>{% endif %}
+        <span class="story-read-time"><i data-lucide="clock"></i> {{ guide.read_time_min }} min read</span>
+      </div>
+      <h1 class="story-detail-title">{{ guide.title }}</h1>
+      {% if guide.author %}<p class="admin-muted">{{ guide.author }}</p>{% endif %}
+    </header>
+
+    <div class="story-detail-body markdown-body guide-body">
+      {{ guide.html | safe }}
+    </div>
+
+    <footer class="story-detail-footer">
+      <div class="detail-actions">
+        <a href="/guides" class="btn btn-outline"><i data-lucide="arrow-left"></i><span>All Guides</span></a>
+        <a href="/documents/Guides/{{ guide.slug }}/" class="btn btn-ghost"><i data-lucide="file-code"></i><span>View in Documents Wiki</span></a>
+        <button class="btn btn-ghost" onclick="window.print()"><i data-lucide="printer"></i><span>Print</span></button>
+      </div>
+    </footer>
+  </div>
+</article>
+{% endblock %}
+
+{% block extra_scripts %}
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+  await mermaid.run({ querySelector: "pre.mermaid" });
+</script>
+{% endblock %}
+

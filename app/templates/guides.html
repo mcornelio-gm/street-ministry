@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Guides | Resonate Church Street Ministry{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+  <div class="container">
+    <div class="page-header-content">
+      <div class="header-pill">
+        <i data-lucide="compass"></i>
+        <span>Documents/Guides</span>
+      </div>
+      <h1 class="page-title">Guides</h1>
+      <p class="page-subtitle">
+        Orientation, safety, and how-to guides for our outreach teams. Please read the
+        <strong>Volunteer Orientation &amp; Safety Briefing</strong> before your first ride-along.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="container content-section">
+  <div class="stories-grid">
+    {% for g in guides %}
+    <article class="story-card guide-card">
+      <div class="story-card-top">
+        <div class="story-meta-row">
+          <span class="guide-pill"><i data-lucide="book-open-check"></i> Guide</span>
+          {% if g.date_display %}<span class="story-date"><i data-lucide="calendar"></i> Updated {{ g.date_display }}</span>{% endif %}
+          <span class="story-read-time"><i data-lucide="clock"></i> {{ g.read_time_min }} min read</span>
+        </div>
+        <h2 class="story-title"><a href="/guides/{{ g.slug }}">{{ g.title }}</a></h2>
+      </div>
+      <div class="story-card-body">
+        <p class="story-summary">{{ g.summary }}</p>
+      </div>
+      <div class="story-card-footer">
+        <div class="story-actions">
+          <span class="story-author">{% if g.author %}<i data-lucide="user"></i> {{ g.author }}{% endif %}</span>
+          <a href="/guides/{{ g.slug }}" class="btn btn-outline btn-sm"><span>Read Guide</span><i data-lucide="arrow-right"></i></a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+      <i data-lucide="book-open"></i>
+      <p>No guides yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

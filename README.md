@@ -12,17 +12,19 @@ Fremont, Newark, Union City, and Hayward, California.
 |---|---|
 | Welcome | `Documents/Welcome.md` + `Documents/Announcements/*.md` (newest first) |
 | Documents | MkDocs Material wiki built from everything in `Documents/` |
+| Guides | `Documents/Guides/*.md` (alphabetical; supports mermaid flowcharts) |
 | Stories | `Documents/Stories/*.md` (newest first) |
 | Routes | `data/routes.json` (table + Leaflet map) |
 | About | `app/templates/about.html` |
-| Admin | `/admin`: edit Announcements and Stories in the browser |
+| Admin | `/admin`: edit Announcements, Stories, and Guides in the browser |
 
 Generated files (do not edit by hand; `hooks.py` rewrites them on every `mkdocs build`):
-`Documents/Routes/index.md`, `Documents/Stories/index.md`, `Documents/Announcements/index.md`.
+`Documents/Routes/index.md`, `Documents/Stories/index.md`, `Documents/Announcements/index.md`,
+`Documents/Guides/index.md`.
 
 ## Where the master copy of content lives
 
-> **Important:** On the live site, **Announcements and Stories live in the Cloud Storage
+> **Important:** On the live site, **Announcements, Stories, and Guides live in the Cloud Storage
 > bucket `gs://resonate-street-ministry-content`**, not in git. Edits made in `/admin`
 > exist only in the bucket until someone pulls them. Redeploying does **not** overwrite
 > the bucket, and editing those folders locally then deploying does **not** update the
@@ -79,7 +81,7 @@ scripts/deploy.sh               # pull live content -> test -> commit & push to 
 scripts/deploy.sh --no-deploy   # just archive live content to GitHub
 ```
 Every release pulls `/admin` edits from the bucket and commits them, so GitHub stays a
-current backup automatically. If you have uncommitted local edits in Announcements/Stories,
+current backup automatically. If you have uncommitted local edits in Announcements/Stories/Guides,
 the script stops rather than overwrite them.
 
 The service keeps its bucket mount, secrets, and settings between deploys.

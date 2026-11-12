@@ -86,7 +86,7 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .mobile-nav-link.active { background: var(--teal); }
 .mobile-menu-footer .tagline { color: #94a3b8; font-size: 0.85rem; }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .nav-tabs, .header-actions .btn { display: none; }
   .mobile-toggle { display: block; }
 }
@@ -370,3 +370,14 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .admin-privacy-hint > svg { flex: 0 0 auto; margin-top: 0.15rem; color: var(--amber); }
 .admin-edit-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
 .EasyMDEContainer .editor-preview, .EasyMDEContainer .editor-preview-side { font-family: var(--font-body); line-height: 1.6; }
+
+/* Guides */
+.guide-pill { display: inline-flex; gap: 0.3rem; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; color: #fff; background: var(--slate-700); }
+.guide-body ul { list-style: none; padding-left: 0; }
+.guide-body ul ul { list-style: disc; padding-left: 1.4rem; }
+.guide-body li { margin-bottom: 0.6rem; }
+.guide-body pre.mermaid { background: #fff; text-align: center; border: 1px solid var(--slate-100); border-radius: 10px; padding: 1rem; }
+@media print {
+  .site-header, .site-footer, .breadcrumb-nav, .story-detail-footer { display: none !important; }
+  body { background: #fff; }
+}

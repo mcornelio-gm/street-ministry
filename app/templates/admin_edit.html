@@ -20,7 +20,7 @@
         <input id="title" name="title" value="{{ m.title or '' }}" required maxlength="160">
       </div>
       <div class="form-group">
-        <label for="date">Date</label>
+        <label for="date">{{ "Last updated" if kind == "guides" else "Date" }}</label>
         <input id="date" name="date" type="date" value="{{ m.date or '' }}" required>
       </div>
       <div class="form-group">
@@ -49,6 +49,11 @@
         <div><strong>Protect our friends' privacy.</strong> Use first names only, or a pseudonym with “(name changed)”
           if details could identify someone. Never use last names, exact sleeping locations, or photos without consent.</div>
       </div>
+      {% elif kind == "guides" %}
+      <div class="form-group admin-span-2">
+        <label for="summary">Summary <span class="admin-hint-inline">one or two sentences shown on the Guides page</span></label>
+        <textarea id="summary" name="summary" rows="2" maxlength="400">{{ m.summary or '' }}</textarea>
+      </div>
       {% else %}
       <div class="form-group">
         <label for="category">Category</label>
@@ -68,7 +73,7 @@
     </div>
 
     <div class="form-group">
-      <label for="body">{{ "Story" if kind == "stories" else "Announcement" }} text</label>
+      <label for="body">{{ kind_label }} text</label>
       <textarea id="body" name="body">{{ item.body }}</textarea>
     </div>
 

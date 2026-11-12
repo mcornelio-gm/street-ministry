@@ -69,9 +69,16 @@ async def logout(request: Request):
 async def dashboard(request: Request):
     if not _user(request):
         return _login_redirect()
+    sections = [
+        {"kind": "announcements", "url": "/"},
+        {"kind": "stories", "url": "/stories"},
+        {"kind": "guides", "url": "/guides"},
+    ]
+    for s in sections:
+        s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],
+                 items=content_store.list_items(s["kind"]))
     return _render(request, "admin_index.html", {
-        "announcements": content_store.list_items("announcements"),
-        "stories": content_store.list_items("stories"),
+        "sections": sections,
         "flash": request.query_params.get("msg"),
     })
 

@@ -11,7 +11,7 @@ set -euo pipefail
 PROJECT="${GCP_PROJECT:-resonate-street-ministry}"
 BUCKET="${CONTENT_BUCKET:-gs://resonate-street-ministry-content}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-FOLDERS=(Announcements Stories)
+FOLDERS=(Announcements Stories Guides)
 export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_METRICS_ENVIRONMENT }datacloud.antigravity"
 
 case "${1:-}" in

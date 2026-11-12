@@ -13,7 +13,7 @@ REGION="${GCP_REGION:-us-west1}"
 SERVICE="${SERVICE:-street-ministry}"
 BUCKET="${CONTENT_BUCKET:-gs://resonate-street-ministry-content}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-CONTENT_DIRS=(Documents/Announcements Documents/Stories)
+CONTENT_DIRS=(Documents/Announcements Documents/Stories Documents/Guides)
 DO_DEPLOY=1
 [[ "${1:-}" == "--no-deploy" ]] && DO_DEPLOY=0
 export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_METRICS_ENVIRONMENT }datacloud.antigravity"

@@ -14,19 +14,20 @@
 
   {% if flash %}<div class="admin-alert admin-alert-ok"><i data-lucide="check-circle"></i> {{ flash }}</div>{% endif %}
 
-  {% for kind, label, items, url in [
-      ("announcements", "Announcements", announcements, "/"),
-      ("stories", "Stories", stories, "/stories")] %}
+  {% for s in sections %}
+  {% set kind, items = s["kind"], s["items"] %}
   <div class="card admin-list-card">
     <div class="admin-list-head">
-      <h2>{{ label }} <span class="badge badge-teal">{{ items|length }}</span></h2>
+      <h2>{{ s.plural }} <span class="badge badge-teal">{{ items|length }}</span></h2>
       <div class="admin-list-actions">
-        <a href="{{ url }}" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="eye"></i> View on site</a>
-        <a href="/admin/{{ kind }}/new" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> New {{ label[:-1] if kind == 'announcements' else 'Story' }}</a>
+        <a href="{{ s.url }}" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="eye"></i> View on site</a>
+        <a href="/admin/{{ kind }}/new" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> New {{ s.label }}</a>
       </div>
     </div>
     <table class="routes-table admin-table">
-      <thead><tr><th>Date</th><th>Title</th><th>{{ "City" if kind == "stories" else "Priority" }}</th><th>Author</th><th></th></tr></thead>
+      <thead><tr><th>{{ "Updated" if kind == "guides" else "Date" }}</th><th>Title</th>
+        <th>{% if kind == "stories" %}City{% elif kind == "announcements" %}Priority{% endif %}</th>
+        <th>Author</th><th></th></tr></thead>
       <tbody>
         {% for it in items %}
         <tr>
@@ -34,6 +35,7 @@
           <td><a href="/admin/{{ kind }}/{{ it.slug }}"><strong>{{ it.title }}</strong></a></td>
           <td>
             {% if kind == "stories" %}<span class="city-pill city-{{ it.city|lower|replace(' ', '-') }}">{{ it.city }}</span>
+            {% elif kind == "guides" %}
             {% elif it.priority == "urgent" %}<span class="announcement-urgent-badge">Urgent</span>
             {% else %}<span class="admin-muted">Standard</span>{% endif %}
           </td>

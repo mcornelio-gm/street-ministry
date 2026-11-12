@@ -12,13 +12,13 @@ Welcome to the **Resonate Church Street Ministry Knowledge Base**. This reposito
 
 <div class="grid cards" markdown>
 
--   :fontawesome-solid-hand-holding-heart: **Volunteer Guide**
+-   :fontawesome-solid-hand-holding-heart: **Guides**
 
     ---
 
-    Everything you need to know about preparation, dress code, street etiquette, and de-escalation.
+    Volunteer orientation, safety briefing, and how-to guides for outreach teams.
 
-    [:octicons-arrow-right-24: Read Guide](Volunteer_Guide.md)
+    [:octicons-arrow-right-24: Browse Guides](Guides/index.md)
 
 -   :fontawesome-solid-map-location-dot: **Routes & Maps**
 
@@ -50,7 +50,7 @@ Welcome to the **Resonate Church Street Ministry Knowledge Base**. This reposito
 
 ## Core Guidelines Summary
 
-1. **Buddy System Always:** Never walk into an encampment, creek trail, or isolated parking lot alone. Outreach teams operate in minimum groups of three.
+1. **Buddy System Always:** Never enter tents, isolated alleyways, or vehicles alone. Outreach teams always operate in groups of two or more.
 2. **Respect Personal Space:** Tents, cars, and makeshift shelters are homes. Always announce your arrival from a respectful distance (e.g., *"Good morning! Resonate Street Ministry stopping by with warm coffee and sandwiches!"*).
 3. **No Financial Transactions:** Volunteers do not distribute cash directly. We provide meal packs, hot food, gas cards, grocery vouchers, or bus passes approved by team leads.
 4. **Confidentiality & Photo Dignity:** Never take or publish photos of unhoused individuals without explicit, informed written consent.
