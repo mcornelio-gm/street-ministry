@@ -8,6 +8,5 @@ title: Street Ministry Announcements Archive
 
 Official announcements, supply drives, and operational schedule updates for the Resonate Church Street Ministry team.
 
-* [Urgent Need: Winter Tarps, Heavy Sleeping Bags & Rain Ponchos](2026-11-10-winter-shelter-drive.md) — November 10, 2026
-* [Hayward Outreach Route: New Staging Location at B Street Plaza](2026-10-28-hayward-route-update.md) — October 28, 2026
-* [Quarterly Street Ministry Orientation & De-escalation Workshop](2026-10-15-volunteer-orientation.md) — October 15, 2026
+* [December Outreach and New Volunteers](2026-11-10-winter-shelter-drive.md) — November 12, 2026
+* [Newark Jacks Route Update](2026-10-28-hayward-route-update.md) — November 12, 2026

@@ -1,21 +1,17 @@
 ---
-title: "Urgent Need: Winter Tarps, Heavy Sleeping Bags & Rain Ponchos"
-date: 2026-11-10
-author: "Outreach Logistics Team"
-category: "Supplies & Donations"
-priority: "urgent"
+title: December Outreach and New Volunteers
+date: 2026-11-12
+author: Kent Mitchell
+category: Events
+priority: urgent
 ---
 
-# Urgent Need: Winter Tarps, Heavy Sleeping Bags & Rain Ponchos
+- **Street ministry will be promoted on December 8 and December 15** as an opportunity for newcomers to learn about the ministry and join a route.
 
-As temperatures begin dropping into the low 40s across the East Bay, rainstorms are causing heavy mud and flooding along creek encampments in **Hayward (San Lorenzo Creek)** and **Fremont (Alameda Creek overflow)**.
+- **Volunteers will prepare additional “Bags of Love” for the outreach**. The group expects higher-than-usual participation and may produce more bags than are immediately needed.
 
-### Immediate Critical Items Needed:
-* **Heavy-Duty Waterproof Tarps** (8x10 or 10x12, with grommets)
-* **Sub-Zero Rated Sleeping Bags** & Fleece Blankets
-* **Durable Rain Ponchos & Waterproof Boots** (Men's sizes 9–13, Women's 7–10)
-* **Thermal Wool Socks** (Brand new in original packaging)
-* **Hand & Toe Warmers** (Bulk boxes)
+- **Route leaders should plan how to accommodate new volunteers**, recognizing that each route has different capacity, geography, and logistics.
 
-Drop-offs can be brought to the Resonate Church lobby before Sunday service or to the Fremont distribution trailer on Thursday between 5:00 PM and 7:00 PM.
+- **Possible approaches** include splitting a route between two leaders, covering fewer stops, assigning small groups to different areas, or limiting the number of newcomers on a particular route.
 
+- **All team members—not only route leaders—are asked to help** orient and support first-time volunteers. Route representatives should communicate the plan to their teams, and additional details will be sent by email.
