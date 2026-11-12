@@ -145,12 +145,27 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         priority = form.get("priority", "standard")
         meta["priority"] = priority if priority in PRIORITIES else "standard"
 
+    # Base filename derived from title (+ date for dated content)
+    # Guides are reference pages, so no date prefix (stable URLs like /guides/volunteer-guide)
+    base = slugify(title) if kind == "guides" else f"{d.isoformat()}-{slugify(title)}"
+
+    old_slug, aliases = None, []
+    if slug is not None:
+        old_path = _path(kind, slug)
+        if not os.path.exists(old_path):
+            raise ContentError("This item no longer exists (was it deleted?)")
+        existing = frontmatter.load(old_path).metadata.get("aliases") or []
+        aliases = [a for a in existing if isinstance(a, str)]
+        if not _matches_base(slug, base):
+            # Title or date changed: rename the file, remember the old name for redirects
+            old_slug, slug = slug, None
+
     if slug is None:
-        # Guides are reference pages, so no date prefix (stable URLs like /guides/volunteer-guide)
-        base = slugify(title) if kind == "guides" else f"{d.isoformat()}-{slugify(title)}"
-        slug, n = base, 2
-        while os.path.exists(_path(kind, slug)):
-            slug, n = f"{base}-{n}", n + 1
+        slug = _unique_slug(kind, base)
+    if old_slug:
+        aliases = [a for a in aliases + [old_slug] if a != slug]
+    if aliases:
+        meta["aliases"] = sorted(set(aliases))
     path = _path(kind, slug)
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -159,7 +174,39 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         f.write(frontmatter.dumps(frontmatter.Post(body + "\n", **meta), sort_keys=False))
         f.write("\n")
     os.replace(tmp, path)
+    if old_slug:
+        os.remove(_path(kind, old_slug))
     return slug
+
+
+def _matches_base(slug: str, base: str) -> bool:
+    """True if slug is base or base with a numeric collision suffix (base-2, base-3...)."""
+    if slug == base:
+        return True
+    prefix = base + "-"
+    return slug.startswith(prefix) and slug[len(prefix):].isdigit()
+
+
+def _unique_slug(kind: str, base: str) -> str:
+    """First free slug: base, base-2, base-3... (also avoids names used as redirects)."""
+    taken_aliases = all_aliases(kind)
+    slug, n = base, 2
+    while os.path.exists(_path(kind, slug)) or slug in taken_aliases:
+        slug, n = f"{base}-{n}", n + 1
+    return slug
+
+
+def all_aliases(kind: str) -> dict[str, str]:
+    """Map old slug -> current slug for every item in a folder."""
+    result = {}
+    folder = _folder(kind)
+    if not os.path.isdir(folder):
+        return result
+    for name in os.listdir(folder):
+        if name.endswith(".md") and name != "index.md":
+            for a in frontmatter.load(os.path.join(folder, name)).metadata.get("aliases") or []:
+                result[str(a)] = name[:-3]
+    return result
 
 
 def delete_item(kind: str, slug: str):

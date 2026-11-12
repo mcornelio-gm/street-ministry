@@ -4,6 +4,8 @@ date: 2026-11-12
 author: Kent Mitchell
 category: Events
 priority: urgent
+aliases:
+- 2026-11-10-winter-shelter-drive
 ---
 
 - **Street ministry will be promoted on December 8 and December 15** as an opportunity for newcomers to learn about the ministry and join a route.

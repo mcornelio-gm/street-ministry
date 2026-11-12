@@ -4,6 +4,8 @@ date: 2026-11-12
 author: Kent Mitchell
 category: Route Logistics
 priority: standard
+aliases:
+- 2026-10-28-hayward-route-update
 ---
 
 - The Newark Jacks serve the area around the Jack in the Box near Dakota Road, generally walking through the surrounding area. **The route has experienced several team-member changes,** but the leader expressed gratitude for the unique strengths each volunteer brings.

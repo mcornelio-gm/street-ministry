@@ -89,8 +89,9 @@ def test_story_create_edit_delete(client):
         assert client.get(f"/documents/Stories/{slug}/").status_code == 200
         assert "Zz Test Story" in client.get("/documents/Stories/").text
 
-        # Edit keeps the same file
+        # Editing the title renames the file (old URL redirects; see rename test)
         client.post("/admin/stories/save", data={**form, "slug": slug, "title": "Zz Edited"})
+        slug = "2026-11-11-zz-edited"
         item = content_store.load_item("stories", slug)
         assert item["meta"]["title"] == "Zz Edited"
         assert item["meta"]["tags"] == "Test, Admin"
@@ -101,8 +102,9 @@ def test_story_create_edit_delete(client):
         assert client.get(f"/stories/{slug}").status_code == 404
         slug = None
     finally:
-        if slug:
-            content_store.delete_item("stories", slug)
+        for s in (slug, "2026-11-11-zz-test-story", "2026-11-11-zz-edited"):
+            if s and os.path.exists(content_store._path("stories", s)):
+                content_store.delete_item("stories", s)
 
 
 def test_guide_create_edit_delete(client):
@@ -124,6 +126,55 @@ def test_guide_create_edit_delete(client):
     finally:
         if os.path.exists(content_store._path("guides", slug)):
             content_store.delete_item("guides", slug)
+
+
+def test_rename_on_title_change_with_redirects(client):
+    login(client)
+    form = {"title": "Zz Rename One", "date": "2026-11-12", "city": "Newark",
+            "author": "Tester", "summary": "s", "body": "Body."}
+    s1, s2, s3 = "2026-11-12-zz-rename-one", "2026-11-12-zz-rename-two", "2026-11-13-zz-rename-two"
+    try:
+        client.post("/admin/stories/save", data=form)
+        assert os.path.exists(content_store._path("stories", s1))
+
+        # Body-only edit: filename unchanged, no aliases
+        client.post("/admin/stories/save", data={**form, "slug": s1, "body": "Typo fixed."})
+        assert os.path.exists(content_store._path("stories", s1))
+        assert "aliases" not in content_store.load_item("stories", s1)["meta"]
+
+        # Title change: renamed, old file gone, old URL redirects
+        client.post("/admin/stories/save", data={**form, "slug": s1, "title": "Zz Rename Two"})
+        assert not os.path.exists(content_store._path("stories", s1))
+        assert content_store.load_item("stories", s2)["meta"]["aliases"] == [s1]
+        r = client.get(f"/stories/{s1}", follow_redirects=False)
+        assert r.status_code == 301 and r.headers["location"] == f"/stories/{s2}"
+
+        # Date change: renamed again; both old URLs still redirect
+        client.post("/admin/stories/save", data={**form, "slug": s2, "title": "Zz Rename Two",
+                                                 "date": "2026-11-13"})
+        assert sorted(content_store.load_item("stories", s3)["meta"]["aliases"]) == [s1, s2]
+        for old in (s1, s2):
+            r = client.get(f"/stories/{old}", follow_redirects=False)
+            assert r.headers["location"] == f"/stories/{s3}"
+        assert client.get(f"/stories/{s3}").status_code == 200
+        # Old admin edit links follow too
+        r = client.get(f"/admin/stories/{s1}", follow_redirects=False)
+        assert r.headers["location"] == f"/admin/stories/{s3}"
+
+        # A new item can't take a name that is used as a redirect
+        new = client.post("/admin/stories/save", data={**form, "title": "Zz Rename One"},
+                          follow_redirects=False)
+        assert new.status_code == 303
+        assert os.path.exists(content_store._path("stories", s1 + "-2"))
+    finally:
+        for s in (s1, s1 + "-2", s2, s3):
+            if os.path.exists(content_store._path("stories", s)):
+                content_store.delete_item("stories", s)
+
+
+def test_collision_suffix_is_not_treated_as_rename(client):
+    assert content_store._matches_base("2026-11-12-x-2", "2026-11-12-x")
+    assert not content_store._matches_base("2026-11-12-x-y", "2026-11-12-x")
 
 
 def test_announcement_create_and_delete(client):

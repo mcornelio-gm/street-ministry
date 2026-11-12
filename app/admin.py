@@ -102,6 +102,9 @@ async def edit_item(request: Request, kind: str, slug: str):
     try:
         item = content_store.load_item(kind, slug)
     except ContentError:
+        new_slug = content_store.all_aliases(kind).get(slug) if kind in KINDS else None
+        if new_slug:
+            return RedirectResponse(url=f"/admin/{kind}/{new_slug}", status_code=303)
         return RedirectResponse(url="/admin?msg=Not+found", status_code=303)
     return _render(request, "admin_edit.html", _form_ctx(kind, item))
 

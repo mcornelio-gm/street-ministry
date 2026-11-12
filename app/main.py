@@ -87,6 +87,9 @@ async def stories(request: Request):
 async def story_detail(request: Request, slug: str):
     story = md_engine.get_story_by_slug(slug)
     if not story:
+        new_slug = content_store.all_aliases("stories").get(slug)
+        if new_slug:  # renamed in /admin: send old links to the new address
+            return RedirectResponse(url=f"/stories/{new_slug}", status_code=301)
         raise HTTPException(status_code=404, detail="Story not found")
     return templates.TemplateResponse(
         request,
@@ -106,6 +109,9 @@ async def guides(request: Request):
 async def guide_detail(request: Request, slug: str):
     guide = md_engine.get_guide_by_slug(slug)
     if not guide:
+        new_slug = content_store.all_aliases("guides").get(slug)
+        if new_slug:
+            return RedirectResponse(url=f"/guides/{new_slug}", status_code=301)
         raise HTTPException(status_code=404, detail="Guide not found")
     return templates.TemplateResponse(
         request, "guide_detail.html", {"active_tab": "guides", "guide": guide}
