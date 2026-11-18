@@ -25,9 +25,11 @@ Thank you for your heart to serve our unhoused neighbors. Entering spaces where 
 - ✅ **Respect Privacy**: Never take photos, record video, or post stories on social media without explicit permission.
 
 - ✅ **Announce Yourself**: Tents, cars, and makeshift shelters are homes. Knock gently on a car window or call out from 6–8 feet away from a tent door:
+
     > *"Good morning! Resonate Church Street Ministry here with hot breakfast and fresh water. Are you open for visitors today?"*
 
     If someone declines or asks you to leave, honor their boundary:
+
     > *"No problem at all, friend! We have water and food kits here if you want any later. Have a blessed morning."*
 
 ---

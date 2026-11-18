@@ -1,5 +1,42 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+{{ super() }}
+<script>
+  /* Share light/dark with the main site ("sm-color-scheme" in localStorage).
+     Runs before Material reads its own stored palette, so the wiki opens in the same
+     scheme as the site. With no site override, Material follows the system. */
+  (function () {
+    try {
+      var palettes = {
+        light: { index: 0, color: { media: "(prefers-color-scheme: light)", scheme: "default", primary: "teal", accent: "amber" } },
+        dark:  { index: 1, color: { media: "(prefers-color-scheme: dark)",  scheme: "slate",   primary: "teal", accent: "amber" } }
+      };
+      var pref = localStorage.getItem("sm-color-scheme");
+      if (palettes[pref]) __md_set("__palette", palettes[pref]);
+      else localStorage.removeItem(__md_scope.pathname + ".__palette");
+    } catch (e) {}
+  })();
+</script>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  /* The wiki's own toggle updates the site preference too (same two-state rule as the site). */
+  document.addEventListener("change", function (e) {
+    var input = e.target;
+    if (!input || input.name !== "__palette") return;
+    var chosen = input.getAttribute("data-md-color-scheme") === "slate" ? "dark" : "light";
+    var system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    try {
+      if (chosen === system) localStorage.removeItem("sm-color-scheme");
+      else localStorage.setItem("sm-color-scheme", chosen);
+    } catch (err) {}
+  });
+</script>
+{% endblock %}
+
 {% block announce %}
 <div class="resonate-topbar">
   <div class="resonate-topbar-content">

@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Light/dark: follows the system unless the visitor pinned one with the header toggle.
+       Inline (not deferred) so the stored choice applies before first paint (no theme flash). -->
+  <meta name="color-scheme" content="light dark">
+  <script>try{document.querySelector('meta[name="color-scheme"]').content=localStorage.getItem("sm-color-scheme")??"light dark"}catch(e){}</script>
   <title>{% block title %}Resonate Church Street Ministry{% endblock %} | Fremont • Newark • Union City • Hayward</title>
   
   <!-- Favicon -->
@@ -65,6 +69,10 @@
 
       <!-- Action Button & Mobile Toggle -->
       <div class="header-actions">
+        <button type="button" class="theme-toggle" id="themeToggle">
+          <span class="to-dark"><i data-lucide="moon"></i><span class="visually-hidden">Switch to dark theme</span></span>
+          <span class="to-light"><i data-lucide="sun"></i><span class="visually-hidden">Switch to light theme</span></span>
+        </button>
         <a href="/about#volunteer" class="btn btn-primary btn-sm">
           <i data-lucide="sparkles"></i>
           <span>Join a Route</span>
@@ -185,6 +193,31 @@
         mobileMenu.classList.toggle('open');
       });
     }
+
+    // Light/dark toggle. Two states: follow the system (nothing stored), or the opposite
+    // of the system (stored literally). Choosing what the system already shows clears the
+    // override, so the site goes back to following the system.
+    (() => {
+      const KEY = 'sm-color-scheme';
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      const systemDark = matchMedia('(prefers-color-scheme: dark)');
+      const rendered = () =>
+        (meta.content === 'dark' || meta.content === 'light') ? meta.content
+          : (systemDark.matches ? 'dark' : 'light');
+      document.getElementById('themeToggle')?.addEventListener('click', () => {
+        const target = rendered() === 'dark' ? 'light' : 'dark';
+        const system = systemDark.matches ? 'dark' : 'light';
+        try {
+          if (target === system) localStorage.removeItem(KEY);
+          else localStorage.setItem(KEY, target);
+        } catch (e) { /* storage blocked: still apply for this page */ }
+        meta.content = target === system ? 'light dark' : target;
+      });
+      // Stay in sync when changed in another tab (or in the Documents wiki)
+      addEventListener('storage', (e) => {
+        if (e.key === KEY) meta.content = e.newValue ?? 'light dark';
+      });
+    })();
   </script>
   {% block extra_scripts %}{% endblock %}
 </body>

@@ -53,6 +53,21 @@ def test_guides_list_and_detail():
     assert "/guides/volunteer-guide" in client.get("/").text
 
 
+def test_theme_toggle_markup():
+    for path in ("/", "/stories", "/guides", "/routes", "/about", "/admin/login"):
+        html = client.get(path).text
+        meta = html.index('<meta name="color-scheme" content="light dark">')
+        # FOUC guard: inline script applies the stored choice right after the meta,
+        # before the stylesheet loads
+        script = html.index('localStorage.getItem("sm-color-scheme")')
+        assert meta < script < html.index('/static/css/style.css'), path
+        assert 'id="themeToggle"' in html and "Switch to dark theme" in html, path
+    css = client.get("/static/css/style.css").text
+    assert ":root { color-scheme: light dark; }" in css  # base must stay "light dark"
+    wiki = client.get("/documents/").text
+    assert "sm-color-scheme" in wiki and "__palette" in wiki  # wiki shares the choice
+
+
 def test_routes_page_and_api():
     r = client.get("/routes")
     assert r.status_code == 200
