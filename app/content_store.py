@@ -18,7 +18,10 @@ KINDS = {
     "announcements": {"folder": "Announcements", "label": "Announcement", "plural": "Announcements"},
     "stories": {"folder": "Stories", "label": "Story", "plural": "Stories"},
     "guides": {"folder": "Guides", "label": "Guide", "plural": "Guides"},
+    "teams": {"folder": "Teams", "label": "Team", "plural": "Teams"},
+    "about": {"folder": "About", "label": "About Page", "plural": "About"},
 }
+DOC_SECTION_KINDS = ("guides", "teams", "about")
 CITIES = ["Fremont", "Newark", "Union City", "Hayward"]
 ANNOUNCEMENT_CATEGORIES = ["General", "Supplies & Donations", "Route Logistics", "Training", "Events"]
 PRIORITIES = ["standard", "urgent"]
@@ -98,7 +101,7 @@ def list_items(kind: str) -> list[dict]:
             "author": post.metadata.get("author", ""),
         })
     items.sort(key=lambda x: (x["date"], x["slug"]), reverse=True)
-    if kind == "guides":
+    if kind in DOC_SECTION_KINDS:
         items.sort(key=lambda x: x["title"].lower())
     return items
 
@@ -141,7 +144,7 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         meta["city"] = city
         meta["tags"] = [t.strip() for t in (form.get("tags") or "").split(",") if t.strip()]
         meta["summary"] = (form.get("summary") or "").strip()
-    elif kind == "guides":
+    elif kind in DOC_SECTION_KINDS:
         meta["summary"] = (form.get("summary") or "").strip()
     else:
         category = (form.get("category") or "General").strip()
@@ -150,8 +153,8 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         meta["priority"] = priority if priority in PRIORITIES else "standard"
 
     # Base filename derived from title (+ date for dated content)
-    # Guides are reference pages, so no date prefix (stable URLs like /guides/volunteer-guide)
-    base = slugify(title) if kind == "guides" else f"{d.isoformat()}-{slugify(title)}"
+    # Guides, Teams, and About are reference pages, so no date prefix (stable URLs)
+    base = slugify(title) if kind in DOC_SECTION_KINDS else f"{d.isoformat()}-{slugify(title)}"
 
     old_slug, aliases = None, []
     if slug is not None:

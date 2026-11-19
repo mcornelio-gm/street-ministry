@@ -468,7 +468,14 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 }
 
 /* Components kept light in both schemes (third-party widgets with fixed light styling) */
-.EasyMDEContainer, .editor-toolbar, .editor-preview, .editor-preview-side { color-scheme: light; }
+.EasyMDEContainer, .editor-toolbar, .editor-preview, .editor-preview-side {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #1e293b;
+}
+.EasyMDEContainer .editor-toolbar { background-color: #f8fafc; border-color: #cbd5e1; }
+.EasyMDEContainer .editor-toolbar button { color: #1e293b; }
+.EasyMDEContainer .CodeMirror { background-color: #ffffff; color: #1e293b; border-color: #cbd5e1; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { color-scheme: light; }
 
 /* Admin: route editor */

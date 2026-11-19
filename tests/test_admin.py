@@ -49,7 +49,7 @@ def test_dashboard_lists_content_but_not_index(client):
     assert login(client).status_code == 303
     r = client.get("/admin")
     assert r.status_code == 200
-    for kind in ("announcements", "stories", "guides"):
+    for kind in ("announcements", "stories", "guides", "teams", "about"):
         for it in content_store.list_items(kind):
             assert f"/admin/{kind}/{it['slug']}" in r.text
         assert f"/admin/{kind}/index" not in r.text
@@ -107,25 +107,26 @@ def test_story_create_edit_delete(client):
                 content_store.delete_item("stories", s)
 
 
-def test_guide_create_edit_delete(client):
+@pytest.mark.parametrize("kind,folder", [("guides", "Guides"), ("teams", "Teams"), ("about", "About")])
+def test_section_doc_create_edit_delete(client, kind, folder):
     login(client)
-    form = {"title": "Zz Test Guide", "date": "2026-11-12", "author": "Tester",
+    form = {"title": f"Zz Test {folder}", "date": "2026-11-18", "author": "Tester",
             "summary": "How to test.", "body": "Step **one**.\n\n```mermaid\nflowchart TD\n  A --> B\n```"}
-    slug = "zz-test-guide"  # guides have no date prefix
+    slug = f"zz-test-{kind}"  # non-dated slugs for guides/teams/about
     try:
-        r = client.post("/admin/guides/save", data=form, follow_redirects=False)
+        r = client.post(f"/admin/{kind}/save", data=form, follow_redirects=False)
         assert r.status_code == 303
-        assert "Zz Test Guide" in client.get("/admin").text
-        page = client.get(f"/guides/{slug}")
+        assert f"Zz Test {folder}" in client.get("/admin").text
+        page = client.get(f"/{kind}/{slug}")
         assert page.status_code == 200 and '<pre class="mermaid">' in page.text
-        assert client.get(f"/documents/Guides/{slug}/").status_code == 200
-        client.post("/admin/guides/save", data={**form, "slug": slug, "summary": "Edited."})
-        assert content_store.load_item("guides", slug)["meta"]["summary"] == "Edited."
-        client.post(f"/admin/guides/{slug}/delete")
-        assert client.get(f"/guides/{slug}").status_code == 404
+        assert client.get(f"/documents/{folder}/{slug}/").status_code == 200
+        client.post(f"/admin/{kind}/save", data={**form, "slug": slug, "summary": "Edited."})
+        assert content_store.load_item(kind, slug)["meta"]["summary"] == "Edited."
+        client.post(f"/admin/{kind}/{slug}/delete")
+        assert client.get(f"/{kind}/{slug}").status_code == 404
     finally:
-        if os.path.exists(content_store._path("guides", slug)):
-            content_store.delete_item("guides", slug)
+        if os.path.exists(content_store._path(kind, slug)):
+            content_store.delete_item(kind, slug)
 
 
 def test_rename_on_title_change_with_redirects(client):

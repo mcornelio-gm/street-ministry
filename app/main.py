@@ -7,7 +7,7 @@ import os
 import secrets
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -115,24 +115,101 @@ async def story_detail(request: Request, slug: str):
     )
 
 
+SECTION_CONFIG = {
+    "guides": {
+        "folder": "Guides",
+        "section_title": "Guides",
+        "page_title": "Guides",
+        "header_pill": "Documents/Guides",
+        "header_icon": "compass",
+        "item_label": "Guide",
+        "item_icon": "book-open-check",
+        "page_subtitle": (
+            "Orientation, safety, and how-to guides for our outreach teams. Please read the "
+            "Volunteer Orientation & Safety Briefing before your first ride-along."
+        ),
+    },
+    "teams": {
+        "folder": "Teams",
+        "section_title": "Teams",
+        "page_title": "Volunteer With Our Teams",
+        "header_pill": "Get Involved",
+        "header_icon": "handshake",
+        "item_label": "Team",
+        "item_icon": "users",
+        "page_subtitle": (
+            "There are many ways to serve depending on your comfort level, schedule, and gifts. "
+            "Explore our outreach and support teams below."
+        ),
+    },
+    "about": {
+        "folder": "About",
+        "section_title": "About",
+        "page_title": "Loving Our Neighbors Across the East Bay",
+        "header_pill": "About Our Outreach",
+        "header_icon": "info",
+        "item_label": "About",
+        "item_icon": "info",
+        "page_subtitle": (
+            "Resonate Church Street Ministry is an intentional, relational outreach serving our "
+            "unhoused neighbors across Fremont, Newark, Union City, and Hayward."
+        ),
+    },
+}
+
+
+def _render_section_list(request: Request, kind: str):
+    cfg = SECTION_CONFIG[kind]
+    return templates.TemplateResponse(
+        request,
+        "section_list.html",
+        {
+            "active_tab": kind,
+            "base_url": f"/{kind}",
+            "docs": md_engine.get_section_docs(cfg["folder"]),
+            **cfg,
+        },
+    )
+
+
+def _render_section_detail(request: Request, kind: str, slug: str):
+    cfg = SECTION_CONFIG[kind]
+    doc = md_engine.get_section_doc_by_slug(cfg["folder"], slug)
+    if not doc:
+        new_slug = content_store.all_aliases(kind).get(slug)
+        if new_slug:
+            return RedirectResponse(url=f"/{kind}/{new_slug}", status_code=301)
+        raise HTTPException(status_code=404, detail=f"{cfg['item_label']} not found")
+    return templates.TemplateResponse(
+        request,
+        "section_detail.html",
+        {
+            "active_tab": kind,
+            "base_url": f"/{kind}",
+            "doc": doc,
+            **cfg,
+        },
+    )
+
+
 @app.get("/guides", response_class=HTMLResponse)
 async def guides(request: Request):
-    return templates.TemplateResponse(
-        request, "guides.html", {"active_tab": "guides", "guides": md_engine.get_guides()}
-    )
+    return _render_section_list(request, "guides")
 
 
 @app.get("/guides/{slug}", response_class=HTMLResponse)
 async def guide_detail(request: Request, slug: str):
-    guide = md_engine.get_guide_by_slug(slug)
-    if not guide:
-        new_slug = content_store.all_aliases("guides").get(slug)
-        if new_slug:
-            return RedirectResponse(url=f"/guides/{new_slug}", status_code=301)
-        raise HTTPException(status_code=404, detail="Guide not found")
-    return templates.TemplateResponse(
-        request, "guide_detail.html", {"active_tab": "guides", "guide": guide}
-    )
+    return _render_section_detail(request, "guides", slug)
+
+
+@app.get("/teams", response_class=HTMLResponse)
+async def teams(request: Request):
+    return _render_section_list(request, "teams")
+
+
+@app.get("/teams/{slug}", response_class=HTMLResponse)
+async def team_detail(request: Request, slug: str):
+    return _render_section_detail(request, "teams", slug)
 
 
 @app.get("/routes", response_class=HTMLResponse)
@@ -151,19 +228,12 @@ async def api_routes():
 
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
-    return templates.TemplateResponse(request, "about.html", {"active_tab": "about"})
+    return _render_section_list(request, "about")
 
 
-@app.post("/contact")
-async def contact(
-    name: str = Form(...),
-    email: str = Form(...),
-    interest: str = Form("general"),
-    message: str = Form(""),
-):
-    # TODO: wire to email / Firestore / Google Sheet before production
-    print(f"[contact] {name} <{email}> interest={interest}: {message}")
-    return RedirectResponse(url="/about?sent=1#volunteer", status_code=303)
+@app.get("/about/{slug}", response_class=HTMLResponse)
+async def about_detail(request: Request, slug: str):
+    return _render_section_detail(request, "about", slug)
 
 
 # Note: Cloud Run reserves paths ending in "z" (e.g. /healthz), so use /health.

@@ -57,6 +57,10 @@
           <i data-lucide="heart-handshake"></i>
           <span>Stories</span>
         </a>
+        <a href="/teams" class="nav-tab {% if active_tab == 'teams' %}active{% endif %}">
+          <i data-lucide="users"></i>
+          <span>Teams</span>
+        </a>
         <a href="/routes" class="nav-tab {% if active_tab == 'routes' %}active{% endif %}">
           <i data-lucide="map-pin"></i>
           <span>Routes</span>
@@ -73,10 +77,6 @@
           <span class="to-dark"><i data-lucide="moon"></i><span class="visually-hidden">Switch to dark theme</span></span>
           <span class="to-light"><i data-lucide="sun"></i><span class="visually-hidden">Switch to light theme</span></span>
         </button>
-        <a href="/about#volunteer" class="btn btn-primary btn-sm">
-          <i data-lucide="sparkles"></i>
-          <span>Join a Route</span>
-        </a>
         <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu">
           <i data-lucide="menu"></i>
         </button>
@@ -102,6 +102,10 @@
           <i data-lucide="heart-handshake"></i>
           <span>Stories</span>
         </a>
+        <a href="/teams" class="mobile-nav-link {% if active_tab == 'teams' %}active{% endif %}">
+          <i data-lucide="users"></i>
+          <span>Teams</span>
+        </a>
         <a href="/routes" class="mobile-nav-link {% if active_tab == 'routes' %}active{% endif %}">
           <i data-lucide="map-pin"></i>
           <span>Routes & Map</span>
@@ -113,7 +117,6 @@
       </nav>
       <div class="mobile-menu-footer">
         <p class="tagline">Serving our unhoused neighbors in Fremont, Newark, Union City & Hayward.</p>
-        <a href="/about#volunteer" class="btn btn-primary btn-block">Sign Up to Volunteer</a>
       </div>
     </div>
   </header>
@@ -150,9 +153,10 @@
           <li><a href="/documents/"><i data-lucide="chevron-right"></i> Searchable Documents</a></li>
           <li><a href="/guides"><i data-lucide="chevron-right"></i> Volunteer Guides</a></li>
           <li><a href="/stories"><i data-lucide="chevron-right"></i> Stories & Testimonies</a></li>
+          <li><a href="/teams"><i data-lucide="chevron-right"></i> Volunteer Teams</a></li>
           <li><a href="/routes"><i data-lucide="chevron-right"></i> Routes & Interactive Map</a></li>
           <li><a href="/about"><i data-lucide="chevron-right"></i> About Our Ministry</a></li>
-          <li><a href="/about#donate"><i data-lucide="chevron-right"></i> Immediate Donation Needs</a></li>
+          <li><a href="/about/critical-needs-checklist"><i data-lucide="chevron-right"></i> Immediate Donation Needs</a></li>
         </ul>
       </div>
 

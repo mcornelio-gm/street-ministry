@@ -109,6 +109,8 @@ async def dashboard(request: Request):
         {"kind": "announcements", "url": "/"},
         {"kind": "stories", "url": "/stories"},
         {"kind": "guides", "url": "/guides"},
+        {"kind": "teams", "url": "/teams"},
+        {"kind": "about", "url": "/about"},
     ]
     for s in sections:
         s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],

@@ -12,7 +12,7 @@ PROJECT="${GCP_PROJECT:-resonate-street-ministry}"
 BUCKET="${CONTENT_BUCKET:-gs://resonate-street-ministry-content}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # bucket folder : local folder
-PAIRS=(Announcements:Documents/Announcements Stories:Documents/Stories Guides:Documents/Guides Data:data)
+PAIRS=(Announcements:Documents/Announcements Stories:Documents/Stories Guides:Documents/Guides Teams:Documents/Teams About:Documents/About Data:data)
 export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_METRICS_ENVIRONMENT }datacloud.antigravity"
 
 case "${1:-}" in

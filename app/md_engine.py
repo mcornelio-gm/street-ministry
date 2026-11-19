@@ -185,11 +185,11 @@ def get_story_by_slug(slug: str) -> dict | None:
     return None
 
 
-def get_guides() -> list:
-    """Read all guides from Documents/Guides, sorted by title."""
-    guides_dir = os.path.join(DOCUMENTS_DIR, "Guides")
-    guides = []
-    for file_path in glob.glob(os.path.join(guides_dir, "*.md")):
+def get_section_docs(folder: str) -> list:
+    """Read all markdown documents from Documents/<folder> (excluding index.md), sorted by title."""
+    section_dir = os.path.join(DOCUMENTS_DIR, folder)
+    docs = []
+    for file_path in glob.glob(os.path.join(section_dir, "*.md")):
         filename = os.path.basename(file_path)
         if filename.lower() == "index.md":
             continue
@@ -207,7 +207,7 @@ def get_guides() -> list:
                 display_date = ""
             slug = os.path.splitext(filename)[0]
             word_count = len(post.content.split())
-            guides.append({
+            docs.append({
                 "slug": slug,
                 "filename": filename,
                 "title": post.metadata.get("title", slug.replace("-", " ").title()),
@@ -218,16 +218,30 @@ def get_guides() -> list:
                 "html": render_markdown(post.content),
             })
         except Exception as e:
-            print(f"Error parsing guide {file_path}: {e}")
-    guides.sort(key=lambda g: g["title"].lower())
-    return guides
+            print(f"Error parsing {folder} doc {file_path}: {e}")
+    docs.sort(key=lambda d: d["title"].lower())
+    return docs
+
+
+def get_section_doc_by_slug(folder: str, slug: str) -> dict | None:
+    """Find a document in Documents/<folder> by its slug."""
+    return next((d for d in get_section_docs(folder) if d["slug"] == slug), None)
+
+
+def get_guides() -> list:
+    return get_section_docs("Guides")
 
 
 def get_guide_by_slug(slug: str) -> dict | None:
-    for g in get_guides():
-        if g["slug"] == slug:
-            return g
-    return None
+    return get_section_doc_by_slug("Guides", slug)
+
+
+def get_teams() -> list:
+    return get_section_docs("Teams")
+
+
+def get_about_docs() -> list:
+    return get_section_docs("About")
 
 
 _build_lock = threading.Lock()

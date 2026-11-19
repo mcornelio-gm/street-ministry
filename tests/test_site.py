@@ -54,7 +54,7 @@ def test_guides_list_and_detail():
 
 
 def test_theme_toggle_markup():
-    for path in ("/", "/stories", "/guides", "/routes", "/about", "/admin/login"):
+    for path in ("/", "/stories", "/guides", "/teams", "/routes", "/about", "/admin/login"):
         html = client.get(path).text
         meta = html.index('<meta name="color-scheme" content="light dark">')
         # FOUC guard: inline script applies the stored choice right after the meta,
@@ -113,10 +113,38 @@ def test_csv_import_parsing(tmp_path):
     assert route["stops"][1]["city"] == "Fremont"
 
 
+def test_teams_and_about_list_and_detail():
+    r_teams = client.get("/teams")
+    assert r_teams.status_code == 200
+    assert "Volunteer With Our Teams" in r_teams.text
+    assert client.get("/teams/volunteer-with-our-teams").status_code == 200
+    assert client.get("/teams/nope").status_code == 404
+
+    r_about = client.get("/about")
+    assert r_about.status_code == 200
+    for title in (
+        "Who We Are",
+        "The Street Reality in Alameda County",
+        "Critical Needs Checklist",
+        "Contact Ministry Leadership",
+        "Emergency Contacts",
+    ):
+        assert title in r_about.text
+    assert client.get("/about/who-we-are").status_code == 200
+    assert client.get("/about/emergency-contacts").status_code == 200
+    assert client.get("/about/nope").status_code == 404
+
+    # Header order: Stories -> Teams -> Routes, and no Join a Route button
+    home = client.get("/").text
+    assert home.index('href="/stories"') < home.index('href="/teams"') < home.index('href="/routes"')
+    assert "Join a Route" not in home
+
+
 def test_generated_wiki_indexes_are_current():
     from hooks import (
-        ANNOUNCEMENTS_MD, GUIDES_MD, ROUTES_MD, STORIES_MD,
-        render_announcements_md, render_guides_md, render_routes_md, render_stories_md,
+        ABOUT_MD, ANNOUNCEMENTS_MD, GUIDES_MD, ROUTES_MD, STORIES_MD, TEAMS_MD,
+        render_about_md, render_announcements_md, render_guides_md,
+        render_routes_md, render_stories_md, render_teams_md,
     )
     from app import md_engine
     from app.routes_data import get_all_routes
@@ -126,20 +154,12 @@ def test_generated_wiki_indexes_are_current():
         STORIES_MD: render_stories_md(md_engine.get_stories()),
         ANNOUNCEMENTS_MD: render_announcements_md(md_engine.get_announcements()),
         GUIDES_MD: render_guides_md(md_engine.get_guides()),
+        TEAMS_MD: render_teams_md(md_engine.get_teams()),
+        ABOUT_MD: render_about_md(md_engine.get_about_docs()),
     }
     for path, content in expected.items():
         with open(path, encoding="utf-8") as f:
             assert f.read() == content, f"{path} is stale; run `mkdocs build`"
-
-
-def test_about_and_contact():
-    assert client.get("/about").status_code == 200
-    r = client.post(
-        "/contact",
-        data={"name": "Test", "email": "t@example.com", "interest": "field", "message": "hi"},
-        follow_redirects=False,
-    )
-    assert r.status_code == 303
 
 
 def test_static_and_health():

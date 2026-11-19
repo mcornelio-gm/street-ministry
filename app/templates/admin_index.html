@@ -28,7 +28,7 @@
       </div>
     </div>
     <table class="routes-table admin-table">
-      <thead><tr><th>{{ "Updated" if kind == "guides" else "Date" }}</th><th>Title</th>
+      <thead><tr><th>{{ "Updated" if kind in ("guides", "teams", "about") else "Date" }}</th><th>Title</th>
         <th>{% if kind == "stories" %}City{% elif kind == "announcements" %}Priority{% endif %}</th>
         <th>Author</th><th></th></tr></thead>
       <tbody>
@@ -38,7 +38,7 @@
           <td><a href="/admin/{{ kind }}/{{ it.slug }}"><strong>{{ it.title }}</strong></a></td>
           <td>
             {% if kind == "stories" %}<span class="city-pill city-{{ it.city|lower|replace(' ', '-') }}">{{ it.city }}</span>
-            {% elif kind == "guides" %}
+            {% elif kind in ("guides", "teams", "about") %}
             {% elif it.priority == "urgent" %}<span class="announcement-urgent-badge">Urgent</span>
             {% else %}<span class="admin-muted">Standard</span>{% endif %}
           </td>
