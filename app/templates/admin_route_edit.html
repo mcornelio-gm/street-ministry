@@ -49,7 +49,7 @@
             <div class="stop-num"></div>
             <div class="stop-fields">
               <input name="stop_name" value="{{ s.name }}" placeholder="Stop name (e.g. Walmart)" aria-label="Stop name">
-              <input name="stop_address" value="{{ s.address }}" placeholder="Address (e.g. 44009 Osgood Rd, Fremont, CA 94539)" aria-label="Stop address">
+              <input name="stop_address" value="{{ s.address }}" placeholder="Address or cross streets (e.g. Washington Blvd &amp; Driscoll Rd, Fremont, CA)" aria-label="Stop address">
               <input type="hidden" name="stop_lat" value="{{ s.lat if s.lat is not none else '' }}">
               <input type="hidden" name="stop_lng" value="{{ s.lng if s.lng is not none else '' }}">
               <input type="hidden" name="stop_approx" value="{{ '1' if s.approx else '0' }}">
@@ -85,7 +85,7 @@
       <div class="stop-num"></div>
       <div class="stop-fields">
         <input name="stop_name" placeholder="Stop name (e.g. Walmart)" aria-label="Stop name">
-        <input name="stop_address" placeholder="Address (e.g. 44009 Osgood Rd, Fremont, CA 94539)" aria-label="Stop address">
+        <input name="stop_address" placeholder="Address or cross streets (e.g. Washington Blvd &amp; Driscoll Rd, Fremont, CA)" aria-label="Stop address">
         <input type="hidden" name="stop_lat" value="">
         <input type="hidden" name="stop_lng" value="">
         <input type="hidden" name="stop_approx" value="0">
@@ -112,6 +112,7 @@
     maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
   let layers = L.layerGroup().addTo(map);
+  let approxMarkers = [];
   let dirty = false;
 
   const rows = () => [...list.querySelectorAll('.stop-row')];
@@ -135,6 +136,7 @@
 
   function redraw(fit) {
     layers.clearLayers();
+    approxMarkers = [];
     const pts = [];
     rows().forEach((row, i) => {
       row.querySelector('.stop-num').textContent = i + 1;
@@ -147,6 +149,11 @@
         title: field(row, 'stop_name').value || field(row, 'stop_address').value
       }).addTo(layers);
       m.bindTooltip(`${i + 1}. ${field(row, 'stop_name').value || field(row, 'stop_address').value}`);
+      if (field(row, 'stop_approx').value === '1') {
+        // Can't-miss prompt on approximate pins (e.g. cross streets)
+        m.bindTooltip('Drag me to the spot', { permanent: true, direction: 'top', offset: [0, -14], className: 'drag-me' });
+        approxMarkers.push(m);
+      }
       m.on('dragend', () => {
         const p = m.getLatLng();
         field(row, 'stop_lat').value = p.lat.toFixed(6);
@@ -169,7 +176,8 @@
       if (d.found) {
         field(row, 'stop_lat').value = d.lat; field(row, 'stop_lng').value = d.lng;
         field(row, 'stop_approx').value = d.approx ? '1' : '0';
-        redraw(false); map.flyTo([d.lat, d.lng], 15);
+        redraw(false);
+        map.flyTo([d.lat, d.lng], d.approx ? 16 : 15);  // approximate: zoom in so it's easy to drag
       } else if (d.unavailable) {
         st.textContent = "The map lookup service couldn't be reached. Try again shortly, or drag a pin by hand."; st.className = 'stop-status warn';
       } else {
@@ -223,5 +231,7 @@
     redraw(false);
   });
   redraw(true);
+  // Open on the first approximate pin, zoomed in, so it gets fixed
+  if (approxMarkers.length) map.setView(approxMarkers[0].getLatLng(), 16);
 </script>
 {% endblock %}

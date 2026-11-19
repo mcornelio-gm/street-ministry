@@ -74,8 +74,8 @@
           <td>
             {{ r.stops|length }} stop{{ "s" if r.stops|length != 1 }}
             {% if r.stops|selectattr("approx")|list or r.stops|selectattr("lat", "none")|list %}
-            <span class="admin-warn" title="Some pins are approximate or missing; edit to adjust">
-              <i data-lucide="alert-triangle"></i> check pins</span>
+            <span class="admin-warn" title="A stop is approximate (e.g. cross streets) or not on the map. Edit and drag its amber pin into place.">
+              <i data-lucide="alert-triangle"></i> pin needs placing</span>
             {% endif %}
           </td>
           <td class="admin-muted">{{ r.schedule or "—" }}</td>

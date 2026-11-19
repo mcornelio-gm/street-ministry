@@ -17,7 +17,7 @@ title: Street Outreach Routes
 |:--|:-----|:--------|
 | 1 | **Irvington Park** | 41825 Blacow Rd, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.531369,-121.989004)) |
 | 2 | **Fremont Bay St Farmer's Market** | 4080 Bay St, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532685,-121.961055)) |
-| 3 | **The Slabs** | Washington Blvd & Driscoll Road, Fremont CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=44.054608,-71.167878)) |
+| 3 | **The Slabs** | Washington Blvd & Driscoll Road, Fremont CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532748,-121.947873)) |
 
 ## Islanders
 

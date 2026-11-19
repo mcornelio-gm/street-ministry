@@ -506,3 +506,5 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .route-stop-dir { font-size: 0.75rem; font-weight: 600; text-decoration: none; }
 .stop-row.active { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(34,147,126,0.25); }
 .route-map { cursor: crosshair; }
+.leaflet-tooltip.drag-me { background: var(--amber); color: #1f1300; border: 0; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+.leaflet-tooltip-top.drag-me::before { border-top-color: var(--amber); }

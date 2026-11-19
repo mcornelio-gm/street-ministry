@@ -19,6 +19,12 @@ case "${1:-}" in
   pull)
     for p in "${PAIRS[@]}"; do
       b="${p%%:*}"; l="${p##*:}"
+      # A folder that doesn't exist in the bucket yet (e.g. before the first deploy that
+      # uses it) must be skipped; syncing from "nothing" would delete the local copy.
+      if ! gcloud storage ls "$BUCKET/$b/" --project="$PROJECT" >/dev/null 2>&1; then
+        echo "Skipping $b (not in the bucket yet)"
+        continue
+      fi
       echo "Pulling $BUCKET/$b -> $l"
       gcloud storage rsync "$BUCKET/$b" "$ROOT/$l" \
         --recursive --delete-unmatched-destination-objects \
