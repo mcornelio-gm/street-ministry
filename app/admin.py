@@ -12,8 +12,17 @@ templates = None  # set by main.py
 
 def _user(request: Request) -> str | None:
     user = request.session.get("admin_user")
-    # Re-check on every request so removing a user takes effect immediately
-    return user if user and user in auth.load_users() else None
+    # Re-checked on every request: removing a user, an owner reset, or a password change
+    # (from another device) ends this session immediately.
+    if user and request.session.get("pw") == auth.password_fingerprint(user):
+        return user
+    return None
+
+
+def _start_session(request: Request, user: str):
+    request.session.clear()
+    request.session["admin_user"] = user
+    request.session["pw"] = auth.password_fingerprint(user)
 
 
 def _login_redirect():
@@ -54,8 +63,7 @@ def login(request: Request, username: str = Form(""), password: str = Form("")):
     if not user:
         auth.record_failure(ip)
         return _render(request, "admin_login.html", {"error": "Incorrect username or password."}, 401)
-    request.session.clear()
-    request.session["admin_user"] = user
+    _start_session(request, user)
     return RedirectResponse(url="/admin", status_code=303)
 
 
@@ -63,6 +71,34 @@ def login(request: Request, username: str = Form(""), password: str = Form("")):
 async def logout(request: Request):
     request.session.clear()
     return _login_redirect()
+
+
+@router.get("/password", response_class=HTMLResponse)
+async def password_page(request: Request):
+    if not _user(request):
+        return _login_redirect()
+    return _render(request, "admin_password.html", {"error": None, "min_length": auth.MIN_PASSWORD_LENGTH})
+
+
+@router.post("/password")
+def change_password(request: Request, current: str = Form(""), new: str = Form(""), confirm: str = Form("")):
+    user = _user(request)
+    if not user:
+        return _login_redirect()
+    ip = request.client.host if request.client else "unknown"
+    if auth.is_rate_limited(ip):
+        return _render(request, "admin_password.html",
+                       {"error": "Too many attempts. Please wait 15 minutes.",
+                        "min_length": auth.MIN_PASSWORD_LENGTH}, 429)
+    try:
+        auth.change_password(user, current, new, confirm)
+    except ValueError as e:
+        if "current password" in str(e):
+            auth.record_failure(ip)
+        return _render(request, "admin_password.html",
+                       {"error": str(e), "min_length": auth.MIN_PASSWORD_LENGTH}, 400)
+    _start_session(request, user)  # keep this device signed in; others are signed out
+    return RedirectResponse(url="/admin?msg=Password+changed", status_code=303)
 
 
 @router.get("", response_class=HTMLResponse)

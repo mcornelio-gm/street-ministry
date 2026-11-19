@@ -71,9 +71,9 @@
         "name": "The Slabs",
         "address": "Washington Blvd & Driscoll Road, Fremont CA 94538",
         "city": "Fremont",
-        "lat": 37.532748,
-        "lng": -121.947873,
-        "approx": true
+        "lat": 37.532395,
+        "lng": -121.954636,
+        "approx": false
       }
     ]
   },
@@ -131,9 +131,9 @@
         "name": "Union Landing & I-880",
         "address": "Union City, CA 94587",
         "city": "Union City",
-        "lat": 37.587258,
-        "lng": -122.021574,
-        "approx": true
+        "lat": 37.60036,
+        "lng": -122.06849,
+        "approx": false
       }
     ]
   }

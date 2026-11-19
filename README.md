@@ -84,6 +84,11 @@ Passwords are stored as PBKDF2 hashes.
 ```
 
 The live site reads the same values from Secret Manager (`admin-users`, `session-secret`).
+Admins can change their own password at `/admin/password`. Those self-chosen passwords are
+stored as hashes in the bucket's private `Private/admin_passwords.json` (locally
+`.admin_passwords.json`), never in git. An owner reset with `manage_admins.py` (pushed to
+Secret Manager) always overrides a self-chosen password, and removing a user from
+`ADMIN_USERS` revokes access immediately. Changing a password signs out other devices.
 After changing users, push the new value and redeploy:
 ```bash
 grep '^ADMIN_USERS=' .env | cut -d= -f2- | tr -d "'" | \

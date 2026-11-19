@@ -17,7 +17,7 @@ title: Street Outreach Routes
 |:--|:-----|:--------|
 | 1 | **Irvington Park** | 41825 Blacow Rd, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.531369,-121.989004)) |
 | 2 | **Fremont Bay St Farmer's Market** | 4080 Bay St, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532685,-121.961055)) |
-| 3 | **The Slabs** | Washington Blvd & Driscoll Road, Fremont CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532748,-121.947873)) |
+| 3 | **The Slabs** | Washington Blvd & Driscoll Road, Fremont CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532395,-121.954636)) |
 
 ## Islanders
 
@@ -45,7 +45,7 @@ title: Street Outreach Routes
 
 | # | Stop | Address |
 |:--|:-----|:--------|
-| 1 | **Union Landing & I-880** | Union City, CA 94587 ([map](https://www.google.com/maps/search/?api=1&query=37.587258,-122.021574)) |
+| 1 | **Union Landing & I-880** | Union City, CA 94587 ([map](https://www.google.com/maps/search/?api=1&query=37.60036,-122.06849)) |
 
 ## Win O Bagels
 

@@ -7,9 +7,12 @@
       <h1>Ministry Admin</h1>
       <p class="admin-muted">Signed in as <strong>{{ admin_user }}</strong>. Changes go live within a few seconds.</p>
     </div>
-    <form method="post" action="/admin/logout">
-      <button class="btn btn-ghost btn-sm" type="submit"><i data-lucide="log-out"></i> Sign Out</button>
-    </form>
+    <div class="admin-list-actions">
+      <a href="/admin/password" class="btn btn-ghost btn-sm"><i data-lucide="key-round"></i> Change Password</a>
+      <form method="post" action="/admin/logout">
+        <button class="btn btn-ghost btn-sm" type="submit"><i data-lucide="log-out"></i> Sign Out</button>
+      </form>
+    </div>
   </div>
 
   {% if flash %}<div class="admin-alert admin-alert-ok"><i data-lucide="check-circle"></i> {{ flash }}</div>{% endif %}

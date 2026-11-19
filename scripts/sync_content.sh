@@ -17,6 +17,18 @@ export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_M
 
 case "${1:-}" in
   pull)
+    # Refuse to overwrite unsaved local content edits (e.g. pins dragged on the local preview)
+    LOCAL_DIRS=(); for p in "${PAIRS[@]}"; do LOCAL_DIRS+=("${p##*:}"); done
+    if [[ "${2:-}" != "--force" ]] && [[ -n "$(cd "$ROOT" && git status --porcelain -- "${LOCAL_DIRS[@]}" | grep -v '/index.md$')" ]]; then
+      echo "You have uncommitted local content changes:"
+      (cd "$ROOT" && git status --short -- "${LOCAL_DIRS[@]}" | grep -v '/index.md$')
+      echo
+      echo "Pulling would overwrite them with the live versions. Either:"
+      echo "  - send them to the live site first:  scripts/sync_content.sh push"
+      echo "  - commit them, or discard them:      git checkout -- <file>"
+      echo "  - or overwrite anyway:               scripts/sync_content.sh pull --force"
+      exit 1
+    fi
     for p in "${PAIRS[@]}"; do
       b="${p%%:*}"; l="${p##*:}"
       # A folder that doesn't exist in the bucket yet (e.g. before the first deploy that

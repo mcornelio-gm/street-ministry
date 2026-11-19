@@ -35,3 +35,6 @@ site/
 .vscode/
 .idea/
 
+
+# Self-service admin password changes (hashes); never commit
+.admin_passwords.json
