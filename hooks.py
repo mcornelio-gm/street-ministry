@@ -32,8 +32,9 @@ def _cell(text) -> str:
 
 
 def render_routes_md(routes: list) -> str:
+    from app.routes_data import route_cities
     cities = sorted(
-        {r.get("city", "Other") for r in routes},
+        {c for r in routes for c in route_cities(r)},
         key=lambda c: (CITY_ORDER.index(c) if c in CITY_ORDER else len(CITY_ORDER), c),
     )
     lines = [
@@ -49,24 +50,28 @@ def render_routes_md(routes: list) -> str:
         "For the interactive map, visit the [Routes tab](/routes).",
         "",
     ]
-    for city in cities:
-        lines += [
-            f"## {city}",
-            "",
-            "| Route | Location | Schedule | Team Lead | Description |",
-            "|:------|:---------|:---------|:----------|:------------|",
-        ]
-        for r in (x for x in routes if x.get("city", "Other") == city):
-            loc = _cell(r.get("target"))
-            if r.get("lat") is not None and r.get("lng") is not None:
-                loc += (
-                    f" ([map](https://www.google.com/maps/search/?api=1&query={r['lat']},{r['lng']}))"
-                )
-            lines.append(
-                f"| **{_cell(r.get('name'))}** | {loc} | {_cell(r.get('schedule'))} "
-                f"| {_cell(r.get('lead'))} | {_cell(r.get('description'))} |"
-            )
+    for r in sorted(routes, key=lambda x: x["name"].lower()):
+        lines += [f"## {r['name']}", ""]
+        facts = []
+        if r.get("leaders"):
+            facts.append(f"**Leaders:** {r['leaders']}")
+        if r.get("schedule"):
+            facts.append(f"**Schedule:** {r['schedule']}")
+        if route_cities(r):
+            facts.append(f"**Cities:** {', '.join(route_cities(r))}")
+        if facts:
+            lines += ["  \n".join(facts), ""]
+        if r.get("summary"):
+            lines += [r["summary"], ""]
+        lines += ["| # | Stop | Address |", "|:--|:-----|:--------|"]
+        for i, s in enumerate(r["stops"], 1):
+            addr = _cell(s.get("address"))
+            if s.get("lat") is not None and s.get("lng") is not None:
+                addr += f" ([map](https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lng']}))"
+            lines.append(f"| {i} | **{_cell(s.get('name'))}** | {addr} |")
         lines.append("")
+        if r.get("notes"):
+            lines += [f"> {line}" if line else ">" for line in r["notes"].splitlines()] + [""]
     return "\n".join(lines)
 
 
@@ -145,8 +150,8 @@ def _write_if_changed(path: str, content: str):
 
 
 def on_pre_build(config, **kwargs):
-    with open(ROUTES_JSON, encoding="utf-8") as f:
-        routes = json.load(f)
+    from app import routes_data
+    routes = routes_data.get_all_routes()  # normalized (adds city, defaults)
     _write_if_changed(ROUTES_MD, render_routes_md(routes))
     _write_if_changed(STORIES_MD, render_stories_md(md_engine.get_stories()))
     _write_if_changed(ANNOUNCEMENTS_MD, render_announcements_md(md_engine.get_announcements()))

@@ -14,9 +14,9 @@ Fremont, Newark, Union City, and Hayward, California.
 | Documents | MkDocs Material wiki built from everything in `Documents/` |
 | Guides | `Documents/Guides/*.md` (alphabetical; supports mermaid flowcharts) |
 | Stories | `Documents/Stories/*.md` (newest first) |
-| Routes | `data/routes.json` (table + Leaflet map) |
+| Routes | `data/routes.json`: routes with one or more stops (table + map); edited in `/admin` |
 | About | `app/templates/about.html` |
-| Admin | `/admin`: edit Announcements, Stories, and Guides in the browser |
+| Admin | `/admin`: edit Announcements, Stories, Guides, and Routes in the browser |
 
 Generated files (do not edit by hand; `hooks.py` rewrites them on every `mkdocs build`):
 `Documents/Routes/index.md`, `Documents/Stories/index.md`, `Documents/Announcements/index.md`,
@@ -24,13 +24,13 @@ Generated files (do not edit by hand; `hooks.py` rewrites them on every `mkdocs 
 
 ## Where the master copy of content lives
 
-> **Important:** On the live site, **Announcements, Stories, and Guides live in the Cloud Storage
+> **Important:** On the live site, **Announcements, Stories, Guides, and `routes.json` live in the Cloud Storage
 > bucket `gs://resonate-street-ministry-content`**, not in git. Edits made in `/admin`
 > exist only in the bucket until someone pulls them. Redeploying does **not** overwrite
 > the bucket, and editing those folders locally then deploying does **not** update the
 > live site. Use `scripts/sync_content.sh push` for that.
 
-Everything else (code, `Welcome.md`, other documents, `data/routes.json`) lives in git
+Everything else (code, `Welcome.md`, other documents) lives in git
 and goes live by redeploying.
 
 ### Periodic backup to GitHub
@@ -45,6 +45,22 @@ Bucket versioning keeps every prior version of each file, so a bad edit or delet
 restored from the bucket even between pulls:
 ```bash
 gcloud storage ls --all-versions gs://resonate-street-ministry-content/Stories/
+```
+
+## Routes data
+
+`data/routes.json` is a pretty-printed JSON list; each route has a permanent `id`, `name`,
+`leaders`, `schedule`, `summary`, `notes`, and ordered `stops` (`name`, `address`, `city`,
+`lat`, `lng`, `approx`). The city is derived from the address. Coordinates are looked up
+from OpenStreetMap when a stop is saved without them; `approx: true` means only the general
+area was found, so drag the pin in `/admin`. Saves are refused if another admin changed the
+file since the form was opened, so no edit is silently lost.
+
+Bulk-load from a spreadsheet (replaces all routes; columns `Route, Leaders, Locations`,
+stops separated by `;`):
+```bash
+.venv/bin/python scripts/import_routes_csv.py routes.csv --dry-run   # preview
+.venv/bin/python scripts/import_routes_csv.py routes.csv
 ```
 
 ## Local development

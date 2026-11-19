@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))  # local only; Cloud Run uses Secret Manager
 
-from app import admin, content_store, md_engine, routes_data  # noqa: E402
+from app import admin, admin_routes, content_store, md_engine, routes_data  # noqa: E402
 
 SITE_DOCS_DIR = os.path.join(PROJECT_ROOT, "site", "documents")
 ON_CLOUD_RUN = bool(os.environ.get("K_SERVICE"))
@@ -40,6 +40,8 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 admin.templates = templates
+# Route-editor endpoints first, so /admin/routes/... isn't caught by the generic /admin/{kind}/...
+app.include_router(admin_routes.router)
 app.include_router(admin.router)
 
 # Point Announcements/Stories at the Cloud Storage bucket (Cloud Run only),
@@ -65,6 +67,7 @@ async def welcome(request: Request):
             "active_tab": "welcome",
             "welcome_doc": md_engine.get_welcome_doc(),
             "announcements": md_engine.get_announcements(),
+            "routes_summary": routes_data.get_routes_summary(),
         },
     )
 
@@ -123,7 +126,7 @@ async def routes(request: Request):
     return templates.TemplateResponse(
         request,
         "routes.html",
-        {"active_tab": "routes", "routes": routes_data.get_all_routes()},
+        {"active_tab": "routes", "routes": routes_data.get_all_routes(), "cities": routes_data.get_cities()},
     )
 
 

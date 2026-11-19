@@ -34,17 +34,21 @@ def setup_content_mount():
     mount = os.environ.get("CONTENT_MOUNT")
     if not mount:
         return
-    for kind in KINDS.values():
-        local = os.path.join(DOCUMENTS_DIR, kind["folder"])
-        remote = os.path.join(mount, kind["folder"])
+    pairs = [(os.path.join(DOCUMENTS_DIR, k["folder"]), os.path.join(mount, k["folder"]))
+             for k in KINDS.values()]
+    # Routes data (data/routes.json) lives in the bucket's Data/ folder
+    pairs.append((os.path.join(os.path.dirname(DOCUMENTS_DIR), "data"), os.path.join(mount, "Data")))
+    for local, remote in pairs:
         if os.path.islink(local):
             continue
         os.makedirs(remote, exist_ok=True)
-        has_content = any(f.endswith(".md") and f != "index.md" for f in os.listdir(remote))
+        has_content = any(
+            (f.endswith(".md") and f != "index.md") or f.endswith(".json") for f in os.listdir(remote)
+        )
         if not has_content and os.path.isdir(local):
             print(f"Seeding {remote} from image")
             for name in os.listdir(local):
-                if name.endswith(".md"):
+                if name.endswith((".md", ".json")):
                     shutil.copy2(os.path.join(local, name), os.path.join(remote, name))
         shutil.rmtree(local, ignore_errors=True)
         os.symlink(remote, local)

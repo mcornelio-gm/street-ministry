@@ -11,30 +11,34 @@ set -euo pipefail
 PROJECT="${GCP_PROJECT:-resonate-street-ministry}"
 BUCKET="${CONTENT_BUCKET:-gs://resonate-street-ministry-content}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-FOLDERS=(Announcements Stories Guides)
+# bucket folder : local folder
+PAIRS=(Announcements:Documents/Announcements Stories:Documents/Stories Guides:Documents/Guides Data:data)
 export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_METRICS_ENVIRONMENT }datacloud.antigravity"
 
 case "${1:-}" in
   pull)
-    for f in "${FOLDERS[@]}"; do
-      echo "Pulling $BUCKET/$f -> Documents/$f"
-      gcloud storage rsync "$BUCKET/$f" "$ROOT/Documents/$f" \
+    for p in "${PAIRS[@]}"; do
+      b="${p%%:*}"; l="${p##*:}"
+      echo "Pulling $BUCKET/$b -> $l"
+      gcloud storage rsync "$BUCKET/$b" "$ROOT/$l" \
         --recursive --delete-unmatched-destination-objects \
         --exclude='.*\.tmp$' --project="$PROJECT"
     done
     echo
     echo "Done. Review and archive to GitHub:"
-    echo "  git status Documents && git add Documents && git commit -m 'Sync live content' && git push"
+    echo "  git status Documents data && git add Documents data && git commit -m 'Sync live content' && git push"
     ;;
   push)
-    echo "This OVERWRITES live Announcements/Stories in $BUCKET with your local copies"
+    echo "This OVERWRITES live Announcements/Stories/Guides/routes in $BUCKET with your local copies"
     echo "(files missing locally will be deleted from the live site)."
     read -r -p "Type 'push' to continue: " answer
     [[ "$answer" == "push" ]] || { echo "Cancelled."; exit 1; }
-    for f in "${FOLDERS[@]}"; do
-      echo "Pushing Documents/$f -> $BUCKET/$f"
-      gcloud storage rsync "$ROOT/Documents/$f" "$BUCKET/$f" \
-        --recursive --delete-unmatched-destination-objects --project="$PROJECT"
+    for p in "${PAIRS[@]}"; do
+      b="${p%%:*}"; l="${p##*:}"
+      echo "Pushing $l -> $BUCKET/$b"
+      gcloud storage rsync "$ROOT/$l" "$BUCKET/$b" \
+        --recursive --delete-unmatched-destination-objects \
+        --exclude='.*\.tmp$' --project="$PROJECT"
     done
     echo "Done. The live wiki refreshes on the next save in /admin or the next restart/deploy."
     ;;

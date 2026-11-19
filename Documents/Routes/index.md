@@ -6,34 +6,54 @@ title: Street Outreach Routes
 
 # Street Outreach Routes
 
-10 active routes across Fremont, Newark, Union City, Hayward. For the interactive map, visit the [Routes tab](/routes).
+5 active routes across Fremont, Union City, Hayward, Milpitas. For the interactive map, visit the [Routes tab](/routes).
 
-## Fremont
+## Irvington Campers
 
-| Route | Location | Schedule | Team Lead | Description |
-|:------|:---------|:---------|:----------|:------------|
-| **Peralta & Alameda Creek Trail** | Creek encampments & pedestrian trail brush ([map](https://www.google.com/maps/search/?api=1&query=37.5625,-121.996)) | Every Saturday, 8:00 AM | Dave & Sarah M. | Foot patrol along the north and south banks of Alameda Creek. Focus on delivering hot breakfast burritos, fresh water, heavy tarps, and checking on seniors living in dome tents. |
-| **Warm Springs Vehicle Dwellers** | Cars, RVs, and vans in commuter park-and-rides ([map](https://www.google.com/maps/search/?api=1&query=37.5028,-121.94)) | 1st & 3rd Saturday, 9:30 AM | Carlos R. | Mobile outreach serving unhoused workers and families living in vehicles around South Fremont industrial streets. Provides gas vouchers, vehicle oil top-offs, dry pantry boxes, and hygiene kits. |
-| **Centerville Train Station Corridor** | Benches, alleyways, and storefront alcoves ([map](https://www.google.com/maps/search/?api=1&query=37.5583,-122.0075)) | Every Wednesday, 6:00 PM | Michael C. | Evening hospitality walk around historic Centerville. Distribution of warm soup, clean blankets, and hygiene bags. |
+**Leaders:** Karen & Joe  
+**Cities:** Fremont
 
-## Newark
+| # | Stop | Address |
+|:--|:-----|:--------|
+| 1 | **Irvington Park** | 41825 Blacow Rd, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.531369,-121.989004)) |
+| 2 | **Fremont Bay St Farmer's Market** | 4080 Bay St, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532685,-121.961055)) |
+| 3 | **The Slabs** | 3560 Washington Blvd, Fremont CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.532952,-121.954488)) |
 
-| Route | Location | Schedule | Team Lead | Description |
-|:------|:---------|:---------|:----------|:------------|
-| **Cedar & Thornton Industrial Perimeter** | Industrial cul-de-sacs and car camping zones ([map](https://www.google.com/maps/search/?api=1&query=37.531,-122.038)) | 2nd & 4th Saturday, 8:30 AM | Marcus T. | Outreach to long-term vehicle residents along the salt marsh industrial edge. Checking in on safety, providing clean drinking water, dog food for companion animals, and trash disposal bags. |
-| **Newark Blvd Motel Corridor** | Families and individuals in transient weekly motels ([map](https://www.google.com/maps/search/?api=1&query=37.525,-122.045)) | Every Tuesday, 5:30 PM | Lydia C. | Delivering fresh groceries, milk, fruit, and children's school supplies directly to weekly motel rooms. Supporting mothers with housing navigation referrals and prayer support. |
+## Islanders
 
-## Union City
+**Leaders:** Michael Cornelio & Henry Garcia  
+**Cities:** Hayward
 
-| Route | Location | Schedule | Team Lead | Description |
-|:------|:---------|:---------|:----------|:------------|
-| **Decoto Rail Spur & 11th Street** | Rail easements, converted vans, and wooded pockets ([map](https://www.google.com/maps/search/?api=1&query=37.595,-122.021)) | Every Saturday, 8:15 AM | Pastor Dave | Close-knit outreach group walking the historic rail line and surrounding wooded easements. Building multi-month relationships with long-term unhoused neighbors. |
-| **Alvarado-Niles Transit Buffer** | Bus depots, park benches, and commercial buffers ([map](https://www.google.com/maps/search/?api=1&query=37.591,-122.0175)) | Thursday Evenings, 6:30 PM | Rachel H. | Evening presence connecting with folks waiting near public transit hubs. Distributing warm cider, socks, and Alameda County resource pamphlets. |
+| # | Stop | Address |
+|:--|:-----|:--------|
+| 1 | **All Suites Islander Motel office** | 29083 Mission Blvd, Hayward, CA 94544 ([map](https://www.google.com/maps/search/?api=1&query=37.63479,-122.052449)) |
 
-## Hayward
+## Newark Jacks
 
-| Route | Location | Schedule | Team Lead | Description |
-|:------|:---------|:---------|:----------|:------------|
-| **Mission Blvd & A Street Corridor** | Sidewalk camps, alleyways, and motel steps ([map](https://www.google.com/maps/search/?api=1&query=37.674,-122.083)) | Every Saturday, 8:45 AM | Deacon James | Active walking route in downtown Hayward. Engaging folks along Mission Blvd with hearty bagged lunches, fresh underwear/socks, and connecting with South Hayward Parish shelter programs. |
-| **San Lorenzo Creek Greenway** | Dry creek beds, bridge overpasses, and willow groves ([map](https://www.google.com/maps/search/?api=1&query=37.6715,-122.078)) | 1st & 3rd Sunday, 7:30 AM | Outreach Team 4 | Pancake breakfast hospitality table set up beneath the Foothill Blvd bridge. A safe, welcoming morning space for prayer, hot food, and community fellowship. |
-| **Industrial Blvd Parking Buffer** | Commercial roadside vehicle encampments ([map](https://www.google.com/maps/search/?api=1&query=37.648,-122.095)) | Saturday Afternoons, 1:00 PM | Carlos R. | Checking in on vehicle residents parked along long warehouse curbs. Fire extinguisher safety checks, battery charging help, and care packages. |
+**Leaders:** Derrick Chan  
+**Cities:** Fremont
+
+| # | Stop | Address |
+|:--|:-----|:--------|
+| 1 | **Jack in the Box** | 34701 Ardenwood Blvd, Fremont, CA 94555 ([map](https://www.google.com/maps/search/?api=1&query=37.552477,-122.054761)) |
+
+## Union City Haulers
+
+**Leaders:** Christina Huang & Clement Ng  
+**Cities:** Union City
+
+| # | Stop | Address |
+|:--|:-----|:--------|
+| 1 | **Union Landing & I-880** | Union City, CA 94587 ([map](https://www.google.com/maps/search/?api=1&query=37.587258,-122.021574)) |
+
+## Win O Bagels
+
+**Leaders:** Kent Mitchell & Julian Zanders  
+**Cities:** Fremont, Milpitas
+
+| # | Stop | Address |
+|:--|:-----|:--------|
+| 1 | **Walmart** | 44009 Osgood Rd, Fremont, CA 94539 ([map](https://www.google.com/maps/search/?api=1&query=37.511129,-121.94277)) |
+| 2 | **Fremont Blvd & S Grimmer Blvd** | 44790 S Grimmer Blvd, Fremont, CA 94538 ([map](https://www.google.com/maps/search/?api=1&query=37.502302,-121.949748)) |
+| 3 | **Warm Springs BART** | Fremont, CA 94539 ([map](https://www.google.com/maps/search/?api=1&query=37.501631,-121.936509)) |
+| 4 | **Milpitas Library** | 160 N Main St, Milpitas, CA 95035 ([map](https://www.google.com/maps/search/?api=1&query=37.432427,-121.907043)) |

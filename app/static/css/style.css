@@ -470,3 +470,37 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 /* Components kept light in both schemes (third-party widgets with fixed light styling) */
 .EasyMDEContainer, .editor-toolbar, .editor-preview, .editor-preview-side { color-scheme: light; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { color-scheme: light; }
+
+/* Admin: route editor */
+.admin-warn { display: inline-flex; gap: 0.25rem; align-items: center; color: var(--amber-text); background: var(--tint-amber); padding: 0.05rem 0.45rem; border-radius: 6px; font-size: 0.75rem; margin-left: 0.4rem; }
+.route-editor { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.25rem; align-items: start; }
+@media (max-width: 900px) { .route-editor { grid-template-columns: 1fr; } }
+.route-stops-head { display: flex; justify-content: space-between; align-items: center; }
+.route-stops-head h2 { margin: 0; font-size: 1.15rem; }
+.stop-list { list-style: none; padding: 0; margin: 0.75rem 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.stop-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 0.6rem; align-items: start; border: 1px solid var(--slate-300); border-radius: 10px; padding: 0.6rem; background: var(--surface); }
+.stop-num { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; margin-top: 0.2rem; }
+.stop-fields { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.stop-fields input { padding: 0.5rem 0.65rem; border: 1px solid var(--slate-300); border-radius: 8px; font: inherit; font-size: 0.88rem; }
+.stop-fields input[name="stop_name"] { font-weight: 600; }
+.stop-status { font-size: 0.75rem; }
+.stop-status.ok { color: var(--accent-text); }
+.stop-status.warn { color: var(--amber-text); }
+.stop-status.pending { color: var(--slate-500); }
+.stop-actions { display: flex; flex-direction: column; gap: 0.1rem; }
+.stop-actions .btn { padding: 0.3rem 0.45rem; }
+.route-hint { display: block; font-size: 0.8rem; }
+.route-map { height: 440px; border-radius: 12px; border: 1px solid var(--slate-300); }
+.route-pin-wrap { background: none; border: 0; }
+.route-pin { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: #fff; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; font: 700 12px/1 var(--font-body); cursor: grab; }
+.route-pin.approx { background: var(--amber); }
+
+/* Public routes: multi-stop */
+.map-legend { flex-wrap: wrap; }
+.legend-item { display: inline-flex; align-items: center; gap: 0.3rem; margin-right: 0.5rem; }
+.route-name-cell .legend-dot { vertical-align: 0.05em; }
+.route-notes { font-size: 0.78rem; color: var(--slate-500); white-space: pre-line; }
+.route-stop-list { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.route-stop-list li { line-height: 1.35; }
+.route-stop-addr { display: block; font-size: 0.78rem; color: var(--slate-500); }
+.route-stop-dir { font-size: 0.75rem; font-weight: 600; text-decoration: none; }

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}{{ "New" if is_new else "Edit" }} Route | Admin{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+{% endblock %}
+{% block content %}
+<section class="container admin-section">
+  <nav class="breadcrumb-nav"><a href="/admin">Admin</a><span class="sep">/</span><span class="current">{{ "New" if is_new else "Edit" }} Route</span></nav>
+  <h1>{{ "New Route" if is_new else route.name }}</h1>
+
+  {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
+
+  <form method="post" action="/admin/routes/save" class="card admin-edit-form" id="routeForm">
+    <input type="hidden" name="id" value="{{ route.id }}">
+    <input type="hidden" name="version" value="{{ version }}">
+
+    <div class="admin-grid">
+      <div class="form-group">
+        <label for="name">Route name</label>
+        <input id="name" name="name" value="{{ route.name }}" required maxlength="120" placeholder="e.g. Irvington Campers">
+      </div>
+      <div class="form-group">
+        <label for="leaders">Leaders</label>
+        <input id="leaders" name="leaders" value="{{ route.leaders }}" maxlength="200" placeholder="e.g. Karen & Joe">
+      </div>
+      <div class="form-group">
+        <label for="schedule">Schedule</label>
+        <input id="schedule" name="schedule" value="{{ route.schedule }}" maxlength="120" placeholder="e.g. Saturdays, 8:00 AM">
+      </div>
+      <div class="form-group">
+        <label for="summary">Summary <span class="admin-hint-inline">shown in the routes table</span></label>
+        <input id="summary" name="summary" value="{{ route.summary }}" maxlength="300">
+      </div>
+      <div class="form-group admin-span-2">
+        <label for="notes">Notes <span class="admin-hint-inline">optional: parking, meeting spot, what to bring</span></label>
+        <textarea id="notes" name="notes" rows="3" maxlength="2000">{{ route.notes }}</textarea>
+      </div>
+    </div>
+
+    <div class="route-editor">
+      <div class="route-stops">
+        <div class="route-stops-head">
+          <h2>Stops <span class="admin-hint-inline">in visiting order</span></h2>
+          <button type="button" class="btn btn-outline btn-sm" id="addStop"><i data-lucide="plus"></i> Add stop</button>
+        </div>
+        <ol class="stop-list" id="stopList">
+          {% for s in route.stops %}
+          <li class="stop-row">
+            <div class="stop-num"></div>
+            <div class="stop-fields">
+              <input name="stop_name" value="{{ s.name }}" placeholder="Stop name (e.g. Walmart)" aria-label="Stop name">
+              <input name="stop_address" value="{{ s.address }}" placeholder="Address (e.g. 44009 Osgood Rd, Fremont, CA 94539)" aria-label="Stop address">
+              <input type="hidden" name="stop_lat" value="{{ s.lat if s.lat is not none else '' }}">
+              <input type="hidden" name="stop_lng" value="{{ s.lng if s.lng is not none else '' }}">
+              <input type="hidden" name="stop_approx" value="{{ '1' if s.approx else '0' }}">
+              <div class="stop-status"></div>
+            </div>
+            <div class="stop-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-act="find" title="Find on map"><i data-lucide="search"></i></button>
+              <button type="button" class="btn btn-ghost btn-sm" data-act="up" title="Move up"><i data-lucide="arrow-up"></i></button>
+              <button type="button" class="btn btn-ghost btn-sm" data-act="down" title="Move down"><i data-lucide="arrow-down"></i></button>
+              <button type="button" class="btn btn-ghost btn-sm admin-delete" data-act="remove" title="Remove stop"><i data-lucide="x"></i></button>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        <p class="admin-hint-inline route-hint">
+          Pins are looked up from the address when you save (or click <i data-lucide="search"></i>).
+          If a pin is off, <strong>drag it</strong> to the right spot.
+        </p>
+      </div>
+      <div class="route-map-wrap">
+        <div id="routeMap" class="route-map"></div>
+      </div>
+    </div>
+
+    <div class="admin-edit-actions">
+      <a href="/admin" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> {{ "Create Route" if is_new else "Save Changes" }}</button>
+    </div>
+  </form>
+
+  <template id="stopTemplate">
+    <li class="stop-row">
+      <div class="stop-num"></div>
+      <div class="stop-fields">
+        <input name="stop_name" placeholder="Stop name (e.g. Walmart)" aria-label="Stop name">
+        <input name="stop_address" placeholder="Address (e.g. 44009 Osgood Rd, Fremont, CA 94539)" aria-label="Stop address">
+        <input type="hidden" name="stop_lat" value="">
+        <input type="hidden" name="stop_lng" value="">
+        <input type="hidden" name="stop_approx" value="0">
+        <div class="stop-status"></div>
+      </div>
+      <div class="stop-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-act="find" title="Find on map"><i data-lucide="search"></i></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-act="up" title="Move up"><i data-lucide="arrow-up"></i></button>
+        <button type="button" class="btn btn-ghost btn-sm" data-act="down" title="Move down"><i data-lucide="arrow-down"></i></button>
+        <button type="button" class="btn btn-ghost btn-sm admin-delete" data-act="remove" title="Remove stop"><i data-lucide="x"></i></button>
+      </div>
+    </li>
+  </template>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const list = document.getElementById('stopList');
+  const form = document.getElementById('routeForm');
+  const map = L.map('routeMap').setView([37.56, -122.0], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  let layers = L.layerGroup().addTo(map);
+  let dirty = false;
+
+  const rows = () => [...list.querySelectorAll('.stop-row')];
+  const field = (row, n) => row.querySelector(`[name="${n}"]`);
+
+  function status(row) {
+    const lat = field(row, 'stop_lat').value, approx = field(row, 'stop_approx').value === '1';
+    const el = row.querySelector('.stop-status');
+    if (!lat) { el.textContent = 'Not on the map yet. It will be looked up when you save.'; el.className = 'stop-status pending'; }
+    else if (approx) { el.textContent = 'Approximate location. Drag the pin to the exact spot.'; el.className = 'stop-status warn'; }
+    else { el.textContent = 'On the map'; el.className = 'stop-status ok'; }
+  }
+
+  function pinIcon(n, approx) {
+    return L.divIcon({
+      className: 'route-pin-wrap',
+      html: `<div class="route-pin${approx ? ' approx' : ''}">${n}</div>`,
+      iconSize: [28, 28], iconAnchor: [14, 14]
+    });
+  }
+
+  function redraw(fit) {
+    layers.clearLayers();
+    const pts = [];
+    rows().forEach((row, i) => {
+      row.querySelector('.stop-num').textContent = i + 1;
+      status(row);
+      const lat = parseFloat(field(row, 'stop_lat').value), lng = parseFloat(field(row, 'stop_lng').value);
+      if (isNaN(lat) || isNaN(lng)) return;
+      pts.push([lat, lng]);
+      const m = L.marker([lat, lng], {
+        draggable: true, icon: pinIcon(i + 1, field(row, 'stop_approx').value === '1'),
+        title: field(row, 'stop_name').value || field(row, 'stop_address').value
+      }).addTo(layers);
+      m.bindTooltip(`${i + 1}. ${field(row, 'stop_name').value || field(row, 'stop_address').value}`);
+      m.on('dragend', () => {
+        const p = m.getLatLng();
+        field(row, 'stop_lat').value = p.lat.toFixed(6);
+        field(row, 'stop_lng').value = p.lng.toFixed(6);
+        field(row, 'stop_approx').value = '0';  // placed by hand = exact
+        dirty = true;
+        redraw(false);
+      });
+    });
+    if (pts.length > 1) L.polyline(pts, { color: '#22937e', weight: 3, opacity: 0.7, dashArray: '6 6' }).addTo(layers);
+    if (fit && pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 15 });
+  }
+
+  async function find(row) {
+    const st = row.querySelector('.stop-status');
+    st.textContent = 'Looking up…'; st.className = 'stop-status pending';
+    const q = new URLSearchParams({ name: field(row, 'stop_name').value, address: field(row, 'stop_address').value });
+    try {
+      const d = await (await fetch('/admin/geocode?' + q)).json();
+      if (d.found) {
+        field(row, 'stop_lat').value = d.lat; field(row, 'stop_lng').value = d.lng;
+        field(row, 'stop_approx').value = d.approx ? '1' : '0';
+        redraw(false); map.flyTo([d.lat, d.lng], 15);
+      } else {
+        st.textContent = "Couldn't find that address. Check it, or save and drag the pin later."; st.className = 'stop-status warn';
+      }
+    } catch (e) { st.textContent = 'Lookup failed. Try again.'; st.className = 'stop-status warn'; }
+  }
+
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-act]'); if (!btn) return;
+    const row = btn.closest('.stop-row'), act = btn.dataset.act;
+    if (act === 'find') return find(row);
+    if (act === 'up' && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
+    if (act === 'down' && row.nextElementSibling) list.insertBefore(row.nextElementSibling, row);
+    if (act === 'remove') { if (rows().length === 1) { alert('A route needs at least one stop.'); return; } row.remove(); }
+    dirty = true; redraw(false);
+  });
+  // A changed address needs a new lookup (a hand-placed pin is kept if only the name changes)
+  list.addEventListener('change', (e) => {
+    if (e.target.name === 'stop_address') {
+      const row = e.target.closest('.stop-row');
+      field(row, 'stop_lat').value = ''; field(row, 'stop_lng').value = ''; field(row, 'stop_approx').value = '0';
+      redraw(false);
+    }
+  });
+  document.getElementById('addStop').addEventListener('click', () => {
+    list.appendChild(document.getElementById('stopTemplate').content.cloneNode(true));
+    lucide.createIcons();
+    redraw(false);
+    rows().at(-1).querySelector('[name="stop_name"]').focus();
+  });
+
+  form.addEventListener('input', () => { dirty = true; });
+  form.addEventListener('submit', () => { dirty = false; });
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+  redraw(true);
+</script>
+{% endblock %}

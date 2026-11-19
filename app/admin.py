@@ -77,8 +77,12 @@ async def dashboard(request: Request):
     for s in sections:
         s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],
                  items=content_store.list_items(s["kind"]))
+    from app import routes_data
+    routes, routes_version = routes_data.load()
     return _render(request, "admin_index.html", {
         "sections": sections,
+        "routes": routes,
+        "routes_version": routes_version,
         "flash": request.query_params.get("msg"),
     })
 

@@ -55,5 +55,44 @@
     </table>
   </div>
   {% endfor %}
+
+  <div class="card admin-list-card">
+    <div class="admin-list-head">
+      <h2>Routes <span class="badge badge-teal">{{ routes|length }}</span></h2>
+      <div class="admin-list-actions">
+        <a href="/routes" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="eye"></i> View on site</a>
+        <a href="/admin/routes/new" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> New Route</a>
+      </div>
+    </div>
+    <table class="routes-table admin-table">
+      <thead><tr><th>Route</th><th>Leaders</th><th>Stops</th><th>Schedule</th><th></th></tr></thead>
+      <tbody>
+        {% for r in routes %}
+        <tr>
+          <td><a href="/admin/routes/{{ r.id }}"><strong>{{ r.name }}</strong></a></td>
+          <td class="admin-muted">{{ r.leaders }}</td>
+          <td>
+            {{ r.stops|length }} stop{{ "s" if r.stops|length != 1 }}
+            {% if r.stops|selectattr("approx")|list or r.stops|selectattr("lat", "none")|list %}
+            <span class="admin-warn" title="Some pins are approximate or missing; edit to adjust">
+              <i data-lucide="alert-triangle"></i> check pins</span>
+            {% endif %}
+          </td>
+          <td class="admin-muted">{{ r.schedule or "—" }}</td>
+          <td class="text-nowrap admin-row-actions">
+            <a href="/admin/routes/{{ r.id }}" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</a>
+            <form method="post" action="/admin/routes/{{ r.id }}/delete"
+                  onsubmit='return confirm({{ ("Delete route “" ~ r.name ~ "”? This removes it from the site.")|tojson }});'>
+              <input type="hidden" name="version" value="{{ routes_version }}">
+              <button class="btn btn-ghost btn-sm admin-delete" type="submit" title="Delete"><i data-lucide="trash-2"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="admin-muted">No routes yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endblock %}

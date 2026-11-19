@@ -69,12 +69,44 @@ def test_theme_toggle_markup():
 
 
 def test_routes_page_and_api():
+    from app import routes_data
+    routes = routes_data.get_all_routes()
     r = client.get("/routes")
     assert r.status_code == 200
     assert "outreachMap" in r.text
+    for route in routes:  # every route and stop is listed (content-independent)
+        assert route["name"].replace("&", "&amp;") in r.text
+        for s in route["stops"]:
+            assert s["name"].replace("&", "&amp;").replace("'", "&#39;") in r.text
+    for city in routes_data.get_cities():  # city filter comes from the addresses
+        assert f'data-city="{city}"' in r.text
     data = client.get("/api/routes").json()
-    assert len(data) >= 4
-    assert {"name", "city", "lat", "lng", "description"} <= set(data[0])
+    assert len(data) == len(routes)
+    assert {"id", "name", "leaders", "stops"} <= set(data[0])
+    assert {"name", "address", "city", "lat", "lng"} <= set(data[0]["stops"][0])
+
+
+def test_city_from_address():
+    from app.routes_data import city_from_address as c
+    assert c("29083 Mission Blvd, Hayward, CA 94544") == "Hayward"
+    assert c("3560 Washington Blvd, Fremont CA 94538") == "Fremont"
+    assert c("Union City, CA 94587") == "Union City"
+    assert c("160 N Main St, Milpitas, CA 95035") == "Milpitas"
+
+
+def test_csv_import_parsing(tmp_path):
+    import sys
+    sys.path.insert(0, "scripts")
+    from import_routes_csv import parse_csv
+    p = tmp_path / "r.csv"
+    p.write_text('Route, Leaders, Locations\n'
+                 'Irvington Campers, Karen & Joe, "Irvington Park, Irvington Park, 41825 Blacow Rd, '
+                 'Fremont, CA 94538; The Slabs, 3560 Washington Blvd, Fremont CA 94538"\n')
+    (route,) = parse_csv(str(p))
+    assert route["name"] == "Irvington Campers" and route["leaders"] == "Karen & Joe"
+    assert [s["name"] for s in route["stops"]] == ["Irvington Park", "The Slabs"]
+    assert route["stops"][0]["address"] == "41825 Blacow Rd, Fremont, CA 94538"  # dup name dropped
+    assert route["stops"][1]["city"] == "Fremont"
 
 
 def test_generated_wiki_indexes_are_current():
