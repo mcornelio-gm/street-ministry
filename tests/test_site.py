@@ -64,6 +64,10 @@ def test_theme_toggle_markup():
         assert 'id="themeToggle"' in html and "Switch to dark theme" in html, path
     css = client.get("/static/css/style.css").text
     assert ":root { color-scheme: light dark; }" in css  # base must stay "light dark"
+    # Cache-busting: the stylesheet URL carries a hash of its content
+    import hashlib, re
+    v = re.search(r'/static/css/style\.css\?v=([0-9a-f]+)"', client.get("/").text).group(1)
+    assert v == hashlib.sha256(open("app/static/css/style.css", "rb").read()).hexdigest()[:10]
     wiki = client.get("/documents/").text
     assert "sm-color-scheme" in wiki and "__palette" in wiki  # wiki shares the choice
 

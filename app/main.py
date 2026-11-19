@@ -39,6 +39,20 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+
+def _file_version(path: str) -> str:
+    """Short content hash, appended as ?v=... so browsers fetch changed CSS instead of
+    reusing a stale cached copy."""
+    import hashlib
+    try:
+        with open(path, "rb") as f:
+            return hashlib.sha256(f.read()).hexdigest()[:10]
+    except OSError:
+        return "0"
+
+
+templates.env.globals["css_v"] = _file_version(os.path.join(BASE_DIR, "static", "css", "style.css"))
 admin.templates = templates
 # Route-editor endpoints first, so /admin/routes/... isn't caught by the generic /admin/{kind}/...
 app.include_router(admin_routes.router)
