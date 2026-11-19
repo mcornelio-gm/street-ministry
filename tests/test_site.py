@@ -134,9 +134,16 @@ def test_teams_and_about_list_and_detail():
     assert client.get("/about/emergency-contacts").status_code == 200
     assert client.get("/about/nope").status_code == 404
 
-    # Header order: Stories -> Teams -> Routes, and no Join a Route button
+    # Header order: Welcome -> Guides -> Stories -> Teams -> Routes -> About (no Documents links)
     home = client.get("/").text
-    assert home.index('href="/stories"') < home.index('href="/teams"') < home.index('href="/routes"')
+    assert 'href="/documents/' not in home
+    assert (
+        home.index('href="/guides"')
+        < home.index('href="/stories"')
+        < home.index('href="/teams"')
+        < home.index('href="/routes"')
+        < home.index('href="/about"')
+    )
     assert "Join a Route" not in home
 
 
