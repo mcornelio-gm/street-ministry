@@ -53,6 +53,10 @@ def test_dashboard_lists_content_but_not_index(client):
         for it in content_store.list_items(kind):
             assert f"/admin/{kind}/{it['slug']}" in r.text
         assert f"/admin/{kind}/index" not in r.text
+    edit_page = client.get("/admin/stories/new").text
+    assert 'data-busy-text="Publishing…"' in edit_page and 'save-progress' in edit_page
+    route_page = client.get("/admin/routes/new").text
+    assert 'data-busy-text="Creating Route…"' in route_page and 'save-progress' in route_page
 
 
 def test_path_traversal_rejected(client):

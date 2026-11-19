@@ -213,6 +213,28 @@
         if (e.key === KEY) meta.content = e.newValue ?? 'light dark';
       });
     })();
+
+    // Prevent double-submits and show a busy indicator on forms with data-busy-text
+    document.querySelectorAll('form[data-busy-text]').forEach((f) => {
+      const btn = f.querySelector('button[type="submit"]');
+      if (!btn) return;
+      const origHtml = btn.innerHTML;
+      f.addEventListener('submit', (e) => {
+        if (f.classList.contains('is-submitting')) { e.preventDefault(); return; }
+        f.classList.add('is-submitting');
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span role="status">${f.dataset.busyText}</span>`;
+      });
+      addEventListener('pageshow', (e) => {
+        if (e.persisted) {
+          f.classList.remove('is-submitting');
+          btn.disabled = false;
+          btn.removeAttribute('aria-busy');
+          btn.innerHTML = origHtml;
+        }
+      });
+    });
   </script>
   {% block extra_scripts %}{% endblock %}
 </body>

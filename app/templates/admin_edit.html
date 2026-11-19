@@ -11,7 +11,8 @@
 
   {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
 
-  <form method="post" action="/admin/{{ kind }}/save" class="card admin-edit-form" id="editForm">
+  <form method="post" action="/admin/{{ kind }}/save" class="card admin-edit-form" id="editForm" data-busy-text="{{ 'Publishing…' if is_new else 'Saving…' }}">
+    <div class="save-progress" aria-hidden="true"></div>
     {% if item.slug %}<input type="hidden" name="slug" value="{{ item.slug }}">{% endif %}
 
     <div class="admin-grid">

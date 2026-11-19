@@ -10,7 +10,8 @@
 
   {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
 
-  <form method="post" action="/admin/routes/save" class="card admin-edit-form" id="routeForm">
+  <form method="post" action="/admin/routes/save" class="card admin-edit-form" id="routeForm" data-busy-text="{{ 'Creating Route…' if is_new else 'Saving Route…' }}">
+    <div class="save-progress" aria-hidden="true"></div>
     <input type="hidden" name="id" value="{{ route.id }}">
     <input type="hidden" name="version" value="{{ version }}">
 

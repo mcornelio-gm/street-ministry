@@ -10,4 +10,5 @@ Get involved and serve with our Resonate Church Street Ministry outreach teams.
 
 * [Bread Pickup Team](bread-pickup-team.md) — Pick up bread items from local stores
 * [Food Preparation Team](food-preparation-team.md) — Prepare soups and sandwiches
+* [Join A Route](join-a-route.md) — How To Join A Street Ministry Route
 * [Volunteer With Our Teams](volunteer-with-our-teams.md) — There are many ways to serve depending on your comfort level, schedule, and gifts—from Saturday morning route walkers to meal prep and supply sorting.

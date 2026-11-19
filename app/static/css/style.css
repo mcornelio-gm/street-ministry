@@ -515,3 +515,27 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .route-map { cursor: crosshair; }
 .leaflet-tooltip.drag-me { background: var(--amber); color: #1f1300; border: 0; font-weight: 700; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 .leaflet-tooltip-top.drag-me::before { border-top-color: var(--amber); }
+
+/* Busy / progress indicator for admin form submissions */
+.btn[disabled] { opacity: 0.72; cursor: wait; pointer-events: none; }
+.btn-spinner {
+  display: inline-block; width: 1em; height: 1em; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: btn-spin 0.65s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+.admin-edit-form { position: relative; overflow: hidden; }
+.save-progress {
+  display: none; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--slate-100); overflow: hidden;
+}
+.save-progress::after {
+  content: ""; display: block; width: 45%; height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-light));
+  animation: save-slide 1.1s ease-in-out infinite;
+}
+form.is-submitting .save-progress { display: block; }
+@keyframes save-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(260%); }
+}
