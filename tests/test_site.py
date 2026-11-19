@@ -67,6 +67,7 @@ def test_theme_toggle_markup():
         script = html.index('localStorage.getItem("sm-color-scheme")')
         assert meta < script < html.index('/static/css/style.css'), path
         assert 'id="themeToggle"' in html and "Switch to dark theme" in html, path
+        assert 'id="qrToggle"' in html and 'id="qrDialog"' in html and 'closedby="any"' in html, path
     css = client.get("/static/css/style.css").text
     assert ":root { color-scheme: light dark; }" in css  # base must stay "light dark"
     # Cache-busting: the stylesheet URL carries a hash of its content

@@ -542,3 +542,21 @@ form.is-submitting .save-progress { display: block; }
 
 /* Urgent announcement card on Home grid */
 .announcement-card-urgent { border-left: 4px solid var(--amber); background: var(--tint-amber); }
+
+/* Share QR Code dialog */
+.qr-dialog {
+  border: 0; border-radius: var(--radius); padding: 0; max-width: 360px; width: calc(100% - 2rem);
+  background: var(--surface); color: var(--slate-800); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+.qr-dialog::backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); }
+.qr-dialog-body { padding: 1.25rem; text-align: center; }
+.qr-dialog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+.qr-dialog-head h2 { margin: 0; font-size: 1.15rem; }
+.qr-dialog-sub { margin: 0 0 1rem; font-size: 0.88rem; color: var(--slate-500); }
+.qr-code-box {
+  background: #ffffff; padding: 0.75rem; border-radius: 12px; border: 1px solid var(--slate-300);
+  width: 210px; height: 210px; margin: 0 auto; display: flex; align-items: center; justify-content: center;
+}
+.qr-code-box svg { width: 100%; height: 100%; display: block; }
+.qr-url-text { margin: 0.75rem 0 1rem; font-size: 0.78rem; color: var(--slate-500); word-break: break-all; }
+.qr-dialog-actions { display: flex; gap: 0.6rem; justify-content: center; }

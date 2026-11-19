@@ -69,6 +69,9 @@
 
       <!-- Action Button & Mobile Toggle -->
       <div class="header-actions">
+        <button type="button" class="theme-toggle" id="qrToggle" aria-label="Share site QR code" title="Share site QR code">
+          <i data-lucide="qr-code"></i>
+        </button>
         <button type="button" class="theme-toggle" id="themeToggle">
           <span class="to-dark"><i data-lucide="moon"></i><span class="visually-hidden">Switch to dark theme</span></span>
           <span class="to-light"><i data-lucide="sun"></i><span class="visually-hidden">Switch to light theme</span></span>
@@ -175,6 +178,27 @@
     </div>
   </footer>
 
+  <!-- Share QR Code Dialog -->
+  <dialog id="qrDialog" class="qr-dialog" closedby="any" aria-labelledby="qrDialogTitle">
+    <div class="qr-dialog-body">
+      <div class="qr-dialog-head">
+        <h2 id="qrDialogTitle">Share Street Ministry</h2>
+        <button type="button" class="btn btn-ghost btn-sm" id="qrCloseBtn" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p class="qr-dialog-sub">Scan to open the Home page on any phone:</p>
+      <div id="qrCodeBox" class="qr-code-box" aria-label="QR code for Home page"></div>
+      <p id="qrUrlText" class="qr-url-text"></p>
+      <div class="qr-dialog-actions">
+        <button type="button" class="btn btn-outline btn-sm" id="qrCopyBtn">
+          <i data-lucide="copy"></i><span>Copy Link</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" id="qrDoneBtn">Done</button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- Scripts -->
   <script>
     // Initialize Lucide icons
@@ -235,6 +259,61 @@
         }
       });
     });
+
+    // Share QR Code dialog (Home page of the current origin)
+    (() => {
+      const dialog = document.getElementById('qrDialog');
+      const openBtn = document.getElementById('qrToggle');
+      const box = document.getElementById('qrCodeBox');
+      const urlEl = document.getElementById('qrUrlText');
+      const copyBtn = document.getElementById('qrCopyBtn');
+      if (!dialog || !openBtn) return;
+
+      const homeUrl = window.location.origin + '/';
+      let rendered = false;
+
+      function renderQR() {
+        if (rendered) return;
+        urlEl.textContent = homeUrl;
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
+        script.onload = () => {
+          const qr = window.qrcode(0, 'M');
+          qr.addData(homeUrl);
+          qr.make();
+          box.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+          rendered = true;
+        };
+        script.onerror = () => { box.textContent = homeUrl; };
+        document.head.appendChild(script);
+      }
+
+      openBtn.addEventListener('click', () => {
+        renderQR();
+        dialog.showModal();
+      });
+      document.getElementById('qrCloseBtn')?.addEventListener('click', () => dialog.close());
+      document.getElementById('qrDoneBtn')?.addEventListener('click', () => dialog.close());
+
+      copyBtn?.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(homeUrl);
+          copyBtn.innerHTML = '<span>Copied!</span>';
+          setTimeout(() => { copyBtn.innerHTML = '<i data-lucide="copy"></i><span>Copy Link</span>'; lucide.createIcons(); }, 1800);
+        } catch (e) {}
+      });
+
+      // Fallback light-dismiss for browsers without closedby="any" (e.g., Safari)
+      if (!('closedBy' in HTMLDialogElement.prototype)) {
+        dialog.addEventListener('click', (event) => {
+          if (event.target !== dialog) return;
+          const rect = dialog.getBoundingClientRect();
+          const inside = rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+                         rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
+          if (!inside) dialog.close();
+        });
+      }
+    })();
   </script>
   {% block extra_scripts %}{% endblock %}
 </body>
