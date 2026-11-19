@@ -137,3 +137,61 @@ def test_file_is_readable_json(client):
     text = open(routes_data.DATA_FILE, encoding="utf-8").read()
     assert text.startswith("[\n  {\n    \"id\"")  # pretty-printed, stable key order
     assert json.loads(text)[0]["stops"][0]["name"] == "Islander Motel"
+
+
+def test_geocode_order_census_then_openstreetmap(monkeypatch):
+    calls = []
+    monkeypatch.setattr(routes_data, "_census", lambda q: calls.append(("census", q)) or (37.6366, -122.0544))
+    monkeypatch.setattr(routes_data, "_nominatim", lambda q: calls.append(("osm", q)) or None)
+    hit = routes_data.geocode_stop("76 Union Gas Station", "28590 Mission Blvd, Hayward, CA 94544")
+    assert hit == {"lat": 37.6366, "lng": -122.0544, "approx": False}
+    assert calls == [("census", "28590 Mission Blvd, Hayward, CA 94544")]  # street address: Census first
+
+    calls.clear()
+    monkeypatch.setattr(routes_data, "_nominatim", lambda q: calls.append(("osm", q)) or (37.5, -121.9))
+    hit = routes_data.geocode_stop("Warm Springs BART", "Fremont, CA 94539")
+    assert calls == [("osm", "Warm Springs BART, Fremont, CA 94539")]  # no street number: skip Census
+    assert hit["approx"] is False  # found by place name
+
+
+def test_geocode_unreachable_vs_not_found(monkeypatch):
+    def down(q):
+        raise routes_data.GeocodeUnavailable("blocked")
+    monkeypatch.setattr(routes_data, "_census", down)
+    monkeypatch.setattr(routes_data, "_nominatim", down)
+    with pytest.raises(routes_data.GeocodeUnavailable):
+        routes_data.geocode_stop("X", "1 Main St, Fremont, CA")
+    route = {"stops": [{"name": "X", "address": "1 Main St, Fremont, CA", "lat": None, "lng": None}]}
+    assert routes_data.fill_missing_coordinates(route) == ["X"]  # save still works, stop flagged
+
+    monkeypatch.setattr(routes_data, "_census", lambda q: None)
+    monkeypatch.setattr(routes_data, "_nominatim", lambda q: None)
+    assert routes_data.geocode_stop("X", "1 Main St, Fremont, CA") is None  # genuinely not found
+
+
+def test_geocode_endpoint_reports_unavailable(client, monkeypatch):
+    def down(name, address):
+        raise routes_data.GeocodeUnavailable("blocked")
+    monkeypatch.setattr(routes_data, "geocode_stop", down)
+    assert client.get("/admin/geocode?address=1+Main+St").json() == {"found": False, "unavailable": True}
+
+
+def test_geocode_rejects_far_away_and_handles_intersections(monkeypatch):
+    calls = []
+    monkeypatch.setattr(routes_data, "_census", lambda q: None)
+
+    def osm(q):
+        calls.append(q)
+        if q == "The Slabs":
+            return (44.05, -71.17)  # New Hampshire: must never be used
+        if q == "Washington Blvd, Fremont CA 94538":
+            return (37.53, -121.95)
+        return None
+    monkeypatch.setattr(routes_data, "_nominatim", osm)
+    hit = routes_data.geocode_stop("The Slabs", "Washington Blvd & Driscoll Road, Fremont CA 94538")
+    assert hit == {"lat": 37.53, "lng": -121.95, "approx": True}  # first street, flagged approximate
+    assert "The Slabs" not in calls  # a bare name is never searched when there's an address
+
+    # Results outside the Bay Area are discarded even if a service returns them
+    monkeypatch.setattr(routes_data, "_nominatim", lambda q: (44.05, -71.17))
+    assert routes_data.geocode_stop("The Slabs", "Somewhere, Fremont, CA") is None

@@ -504,3 +504,5 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .route-stop-list li { line-height: 1.35; }
 .route-stop-addr { display: block; font-size: 0.78rem; color: var(--slate-500); }
 .route-stop-dir { font-size: 0.75rem; font-weight: 600; text-decoration: none; }
+.stop-row.active { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(34,147,126,0.25); }
+.route-map { cursor: crosshair; }

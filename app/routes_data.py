@@ -176,9 +176,34 @@ def _has_street_number(text: str) -> bool:
 
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+CENSUS_URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
 USER_AGENT = "ResonateStreetMinistry/1.0 (route admin; contact mcornelio@gmail.com)"
+# Greater Bay Area (west,north,east,south): lookups outside this box are rejected
+SERVICE_AREA_VIEWBOX = "-122.7,38.1,-121.4,37.1"
+SERVICE_AREA = {"lat": (37.1, 38.1), "lng": (-122.7, -121.4)}
 _geo_lock = threading.Lock()
 _last_call = [0.0]
+
+
+class GeocodeUnavailable(RoutesError):
+    """The lookup services couldn't be reached (network problem), as opposed to 'not found'."""
+
+
+def _census(address: str) -> tuple[float, float] | None:
+    """US Census geocoder: precise for US street addresses (free, no key)."""
+    url = CENSUS_URL + "?" + urllib.parse.urlencode(
+        {"address": address, "benchmark": "Public_AR_Current", "format": "json"})
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            matches = json.loads(resp.read().decode("utf-8"))["result"]["addressMatches"]
+    except Exception as e:
+        print(f"census geocode failed for {address!r}: {e}")
+        raise GeocodeUnavailable(str(e))
+    if matches:
+        c = matches[0]["coordinates"]
+        return float(c["y"]), float(c["x"])
+    return None
 
 
 def _nominatim(query: str) -> tuple[float, float] | None:
@@ -189,43 +214,85 @@ def _nominatim(query: str) -> tuple[float, float] | None:
             time.sleep(wait)
         _last_call[0] = time.time()
         url = NOMINATIM_URL + "?" + urllib.parse.urlencode(
-            {"q": query, "format": "jsonv2", "limit": 1, "countrycodes": "us"})
+            {"q": query, "format": "jsonv2", "limit": 1, "countrycodes": "us",
+             # Only accept results inside the greater Bay Area (never "The Slabs, New Hampshire")
+             "viewbox": SERVICE_AREA_VIEWBOX, "bounded": 1})
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         try:
             with urllib.request.urlopen(req, timeout=8) as resp:
                 hits = json.loads(resp.read().decode("utf-8"))
         except Exception as e:
             print(f"geocode failed for {query!r}: {e}")
-            return None
+            raise GeocodeUnavailable(str(e))
     if hits:
         return float(hits[0]["lat"]), float(hits[0]["lon"])
     return None
 
 
+def _in_service_area(lat: float, lng: float) -> bool:
+    return (SERVICE_AREA["lat"][0] <= lat <= SERVICE_AREA["lat"][1]
+            and SERVICE_AREA["lng"][0] <= lng <= SERVICE_AREA["lng"][1])
+
+
 def geocode_stop(name: str, address: str) -> dict | None:
-    """Find coordinates for a stop. Tries 'name, address' then 'address'.
-    Returns {"lat", "lng", "approx"} or None."""
-    candidates = []
-    for q in (f"{name}, {address}" if name and address else "", address, name):
-        q = (q or "").strip(", ")
-        if q and q not in candidates:
-            candidates.append(q)
-    for q in candidates:
-        hit = _nominatim(q)
+    """Find coordinates for a stop. Returns {"lat", "lng", "approx"}, or None if not found.
+    Raises GeocodeUnavailable only if every lookup failed to connect.
+
+    Order: US Census for street addresses (exact); then OpenStreetMap, limited to the
+    Bay Area: 'name, address', then 'address'; for intersections ('A & B, City'),
+    'A, City' (approximate). A bare stop name is never searched on its own."""
+    attempts, failures = 0, 0
+
+    def tried(fn, q):
+        nonlocal attempts, failures
+        attempts += 1
+        try:
+            hit = fn(q)
+        except GeocodeUnavailable:
+            failures += 1
+            return None
+        return hit if hit and _in_service_area(*hit) else None
+
+    if address and _has_street_number(address):
+        hit = tried(_census, address)
         if hit:
-            # Without a street number (or a named place), the hit is probably city-level
-            approx = not _has_street_number(q) and q == address
+            return {"lat": round(hit[0], 6), "lng": round(hit[1], 6), "approx": False}
+
+    candidates = []  # (query, approx)
+    if name and address:
+        candidates.append((f"{name}, {address}", False))
+    if address:
+        candidates.append((address, not _has_street_number(address)))
+        first, _, rest = address.partition(",")
+        if "&" in first and rest.strip():  # intersection: try the first street in that city
+            candidates.append((f"{first.split('&')[0].strip()}, {rest.strip()}", True))
+    elif name:
+        candidates.append((name, True))
+    seen = set()
+    for q, approx in candidates:
+        q = q.strip(", ")
+        if not q or q in seen:
+            continue
+        seen.add(q)
+        hit = tried(_nominatim, q)
+        if hit:
             return {"lat": round(hit[0], 6), "lng": round(hit[1], 6), "approx": approx}
+    if attempts and failures == attempts:
+        raise GeocodeUnavailable("Address lookup services are unreachable")
     return None
 
 
 def fill_missing_coordinates(route: dict, geocoder=None) -> list[str]:
-    """Geocode stops without coordinates. Returns names of stops that couldn't be found."""
+    """Geocode stops without coordinates. Returns names of stops that couldn't be placed
+    (not found, or lookup unavailable). Saving still succeeds; fix pins in /admin."""
     geocoder = geocoder or geocode_stop
     missing = []
     for s in route["stops"]:
         if s.get("lat") is None or s.get("lng") is None:
-            hit = geocoder(s["name"], s["address"])
+            try:
+                hit = geocoder(s["name"], s["address"])
+            except GeocodeUnavailable:
+                hit = None
             if hit:
                 s.update(hit)
             else:

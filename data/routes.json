@@ -14,6 +14,14 @@
         "lat": 37.63479,
         "lng": -122.052449,
         "approx": false
+      },
+      {
+        "name": "76 Union Gas Station",
+        "address": "28590 Mission Blvd, Hayward, CA 94544",
+        "city": "Hayward",
+        "lat": 37.636562,
+        "lng": -122.054362,
+        "approx": false
       }
     ]
   },
@@ -61,11 +69,11 @@
       },
       {
         "name": "The Slabs",
-        "address": "3560 Washington Blvd, Fremont CA 94538",
+        "address": "Washington Blvd & Driscoll Road, Fremont CA 94538",
         "city": "Fremont",
-        "lat": 37.532952,
-        "lng": -121.954488,
-        "approx": false
+        "lat": 37.532748,
+        "lng": -121.947873,
+        "approx": true
       }
     ]
   },

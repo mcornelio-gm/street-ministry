@@ -117,7 +117,10 @@ async def geocode(request: Request, name: str = "", address: str = ""):
     """Used by the route editor's 'Find on map' button."""
     if not admin._user(request):
         return JSONResponse({"error": "unauthorized"}, status_code=401)
-    hit = await run_in_threadpool(routes_data.geocode_stop, name.strip(), address.strip())
+    try:
+        hit = await run_in_threadpool(routes_data.geocode_stop, name.strip(), address.strip())
+    except routes_data.GeocodeUnavailable:
+        return JSONResponse({"found": False, "unavailable": True})
     if not hit:
         return JSONResponse({"found": False})
     return JSONResponse({"found": True, **hit, "city": routes_data.city_from_address(address)})

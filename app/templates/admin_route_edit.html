@@ -66,7 +66,7 @@
         </ol>
         <p class="admin-hint-inline route-hint">
           Pins are looked up from the address when you save (or click <i data-lucide="search"></i>).
-          If a pin is off, <strong>drag it</strong> to the right spot.
+          If a pin is off, <strong>drag it</strong>. To place a stop by hand, <strong>select the stop, then click the map</strong>.
         </p>
       </div>
       <div class="route-map-wrap">
@@ -120,7 +120,7 @@
   function status(row) {
     const lat = field(row, 'stop_lat').value, approx = field(row, 'stop_approx').value === '1';
     const el = row.querySelector('.stop-status');
-    if (!lat) { el.textContent = 'Not on the map yet. It will be looked up when you save.'; el.className = 'stop-status pending'; }
+    if (!lat) { el.textContent = 'Not on the map yet. Click 🔍, save to look it up, or select this stop and click the map.'; el.className = 'stop-status pending'; }
     else if (approx) { el.textContent = 'Approximate location. Drag the pin to the exact spot.'; el.className = 'stop-status warn'; }
     else { el.textContent = 'On the map'; el.className = 'stop-status ok'; }
   }
@@ -170,6 +170,8 @@
         field(row, 'stop_lat').value = d.lat; field(row, 'stop_lng').value = d.lng;
         field(row, 'stop_approx').value = d.approx ? '1' : '0';
         redraw(false); map.flyTo([d.lat, d.lng], 15);
+      } else if (d.unavailable) {
+        st.textContent = "The map lookup service couldn't be reached. Try again shortly, or drag a pin by hand."; st.className = 'stop-status warn';
       } else {
         st.textContent = "Couldn't find that address. Check it, or save and drag the pin later."; st.className = 'stop-status warn';
       }
@@ -203,6 +205,23 @@
   form.addEventListener('input', () => { dirty = true; });
   form.addEventListener('submit', () => { dirty = false; });
   window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+  // Click the map to place (or move) the selected stop's pin
+  let activeRow = null;
+  function setActive(row) {
+    rows().forEach(r => r.classList.toggle('active', r === row));
+    activeRow = row;
+  }
+  list.addEventListener('focusin', (e) => setActive(e.target.closest('.stop-row')));
+  list.addEventListener('click', (e) => { const r = e.target.closest('.stop-row'); if (r) setActive(r); });
+  map.on('click', (e) => {
+    if (!activeRow || !list.contains(activeRow)) { alert('First click a stop in the list, then click the map to place it.'); return; }
+    field(activeRow, 'stop_lat').value = e.latlng.lat.toFixed(6);
+    field(activeRow, 'stop_lng').value = e.latlng.lng.toFixed(6);
+    field(activeRow, 'stop_approx').value = '0';
+    dirty = true;
+    redraw(false);
+  });
   redraw(true);
 </script>
 {% endblock %}
