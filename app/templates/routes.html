@@ -65,7 +65,7 @@
       <div class="table-responsive">
         <table class="routes-table" id="routesTable">
           <thead>
-            <tr><th>Route</th><th>Leaders</th><th>Schedule</th><th>Locations</th><th></th></tr>
+            <tr><th>Route</th><th>Locations</th><th></th></tr>
           </thead>
           <tbody>
             {% for r in routes %}
@@ -74,12 +74,11 @@
               <td>
                 <div class="route-name-cell">
                   <strong><span class="legend-dot" style="background: {{ color }}"></span> {{ r.name }}</strong>
+                  {% if r.leaders %}<span class="lead-pill"><i data-lucide="users"></i> {{ r.leaders }}</span>{% endif %}
                   {% if r.summary %}<span class="route-target">{{ r.summary }}</span>{% endif %}
                   {% if r.notes %}<span class="route-notes">{{ r.notes }}</span>{% endif %}
                 </div>
               </td>
-              <td><span class="lead-pill"><i data-lucide="users"></i> {{ r.leaders or "—" }}</span></td>
-              <td class="text-nowrap">{% if r.schedule %}<span class="schedule-pill"><i data-lucide="clock"></i> {{ r.schedule }}</span>{% else %}<span class="admin-muted">—</span>{% endif %}</td>
               <td>
                 <ol class="route-stop-list">
                   {% for s in r.stops %}

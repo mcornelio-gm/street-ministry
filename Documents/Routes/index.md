@@ -24,9 +24,11 @@ title: Street Outreach Routes
 **Leaders:** Michael Cornelio & Henry Garcia  
 **Cities:** Hayward
 
+The Islander Motel and Suites
+
 | # | Stop | Address |
 |:--|:-----|:--------|
-| 1 | **All Suites Islander Motel office** | 29083 Mission Blvd, Hayward, CA 94544 ([map](https://www.google.com/maps/search/?api=1&query=37.63479,-122.052449)) |
+| 1 | **All Suites Islander Motel** | 29083 Mission Blvd, Hayward, CA 94544 ([map](https://www.google.com/maps/search/?api=1&query=37.63479,-122.052449)) |
 | 2 | **76 Union Gas Station** | 28590 Mission Blvd, Hayward, CA 94544 ([map](https://www.google.com/maps/search/?api=1&query=37.636562,-122.054362)) |
 
 ## Newark Jacks

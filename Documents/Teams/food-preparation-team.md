@@ -1,7 +1,7 @@
 ---
 title: Food Preparation Team
 date: 2026-11-18
-author: Michael Cornelio
+author: Street Ministry Leadership
 summary: Prepare soups and sandwiches
 ---
 

@@ -8,5 +8,6 @@ title: Guides
 
 Orientation, safety, and how-to guides for Street Ministry outreach teams.
 
+* [Engaging With Street Friends](engaging-with-street-friends.md) — How to have a conversation with our street friends.
 * [Route Leader Checklist](route-leader-checklist.md) — Team Shepherding Guidelines
 * [Volunteer Orientation & Safety Briefing](volunteer-guide.md) — Christlike posture, personal safety and boundaries, food handling, de-escalation, and team debrief. Required reading before your first outreach.
