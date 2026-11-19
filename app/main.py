@@ -73,16 +73,29 @@ if os.path.isdir(SITE_DOCS_DIR):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def welcome(request: Request):
+async def home(request: Request):
     return templates.TemplateResponse(
         request,
-        "welcome.html",
+        "home.html",
         {
             "active_tab": "welcome",
-            "welcome_doc": md_engine.get_welcome_doc(),
             "announcements": md_engine.get_announcements(),
-            "routes_summary": routes_data.get_routes_summary(),
         },
+    )
+
+
+@app.get("/announcements/{slug}", response_class=HTMLResponse)
+async def announcement_detail(request: Request, slug: str):
+    announcement = md_engine.get_announcement_by_slug(slug)
+    if not announcement:
+        new_slug = content_store.all_aliases("announcements").get(slug)
+        if new_slug:
+            return RedirectResponse(url=f"/announcements/{new_slug}", status_code=301)
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    return templates.TemplateResponse(
+        request,
+        "announcement_detail.html",
+        {"active_tab": "welcome", "announcement": announcement},
     )
 
 

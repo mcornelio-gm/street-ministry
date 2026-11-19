@@ -98,9 +98,10 @@ def list_items(kind: str) -> list[dict]:
             "date": str(d)[:10] if d else "",
             "city": post.metadata.get("city", ""),
             "priority": post.metadata.get("priority", ""),
+            "pinned": bool(post.metadata.get("pinned")),
             "author": post.metadata.get("author", ""),
         })
-    items.sort(key=lambda x: (x["date"], x["slug"]), reverse=True)
+    items.sort(key=lambda x: (x["pinned"], x["date"], x["slug"]), reverse=True)
     if kind in DOC_SECTION_KINDS:
         items.sort(key=lambda x: x["title"].lower())
     return items
@@ -151,6 +152,11 @@ def save_item(kind: str, form: dict, slug: str | None = None) -> str:
         meta["category"] = category or "General"
         priority = form.get("priority", "standard")
         meta["priority"] = priority if priority in PRIORITIES else "standard"
+        if form.get("pinned") in ("on", "true", "1", True):
+            meta["pinned"] = True
+        summary = (form.get("summary") or "").strip()
+        if summary:
+            meta["summary"] = summary
 
     # Base filename derived from title (+ date for dated content)
     # Guides, Teams, and About are reference pages, so no date prefix (stable URLs)

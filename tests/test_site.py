@@ -6,17 +6,22 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_welcome_renders_doc_and_announcements_sorted():
+def test_home_renders_announcements_pinned_then_newest():
     from app import md_engine
     r = client.get("/")
     assert r.status_code == 200
-    assert "Loving Our Unhoused Neighbors" in r.text  # from Documents/Welcome.md
-    # Every announcement appears, newest first (content-independent: editors change titles)
+    assert "Stepping beyond walls" in r.text
     items = md_engine.get_announcements()
-    dates = [a["date_sort"] for a in items]
-    assert dates == sorted(dates, reverse=True)
+    assert items[0]["pinned"] is True  # Welcome announcement is pinned at top
+    # Pinned first, then newest first
+    keys = [(a["pinned"], a["date_sort"], a["filename"]) for a in items]
+    assert keys == sorted(keys, reverse=True)
     positions = [r.text.index(a["title"].replace("&", "&amp;")) for a in items]
     assert positions == sorted(positions)
+    # Announcement detail page works
+    d = client.get(f"/announcements/{items[0]['slug']}")
+    assert d.status_code == 200 and items[0]["title"].replace("&", "&amp;") in d.text
+    assert client.get("/announcements/nope").status_code == 404
 
 
 def test_documents_mkdocs_site():
@@ -48,9 +53,9 @@ def test_guides_list_and_detail():
     assert '<pre class="mermaid">' in d.text  # flowchart renders via mermaid.js
     assert "Christlike Posture" in d.text
     assert client.get("/guides/nope").status_code == 404
-    # Guides tab in the nav, and the Welcome link points at the new location
+    # Guides tab in the nav, and the Welcome announcement links to the guide
     assert 'href="/guides"' in client.get("/").text
-    assert "/guides/volunteer-guide" in client.get("/").text
+    assert "/guides/volunteer-guide" in client.get("/announcements/2026-11-11-welcome-to-resonate-street-ministry").text
 
 
 def test_theme_toggle_markup():

@@ -8,5 +8,6 @@ title: Street Ministry Announcements Archive
 
 Official announcements, supply drives, and operational schedule updates for the Resonate Church Street Ministry team.
 
+* [Welcome to Resonate Church Street Ministry](2026-11-11-welcome-to-resonate-street-ministry.md) — November 11, 2026
 * [Newark Jacks Route Update](2026-11-12-newark-jacks-route-update.md) — November 12, 2026
 * [December Outreach and New Volunteers](2026-11-12-december-outreach-and-new-volunteers.md) — November 12, 2026

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ announcement.title }} | Resonate Church Street Ministry{% endblock %}
+
+{% block content %}
+<article class="story-detail-article">
+  <div class="container container-sm">
+    <nav class="breadcrumb-nav">
+      <a href="/"><i data-lucide="home"></i> Home</a>
+      <span class="sep">/</span>
+      <span class="current">{{ announcement.title }}</span>
+    </nav>
+
+    <header class="story-detail-header">
+      <div class="story-meta-row">
+        {% if announcement.pinned %}
+        <span class="guide-pill"><i data-lucide="pin"></i> Pinned</span>
+        {% endif %}
+        {% if announcement.priority == 'urgent' %}
+        <span class="announcement-urgent-badge"><i data-lucide="alert-circle"></i> Urgent Need</span>
+        {% endif %}
+        <span class="announcement-category">{{ announcement.category }}</span>
+        <span class="story-date"><i data-lucide="calendar"></i> {{ announcement.date_display }}</span>
+        <span class="story-read-time"><i data-lucide="clock"></i> {{ announcement.read_time_min }} min read</span>
+      </div>
+      <h1 class="story-detail-title">{{ announcement.title }}</h1>
+      {% if announcement.author %}<p class="admin-muted">{{ announcement.author }}</p>{% endif %}
+    </header>
+
+    <div class="story-detail-body markdown-body">
+      {{ announcement.html | safe }}
+    </div>
+
+    <footer class="story-detail-footer">
+      <div class="detail-actions">
+        <a href="/" class="btn btn-outline"><i data-lucide="arrow-left"></i><span>Back to Home</span></a>
+        <button class="btn btn-ghost" onclick="window.print()"><i data-lucide="printer"></i><span>Print</span></button>
+      </div>
+    </footer>
+  </div>
+</article>
+{% endblock %}

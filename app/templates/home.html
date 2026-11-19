@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Resonate Church Street Ministry{% endblock %}
+
+{% block content %}
+<section class="page-header-section">
+  <div class="container">
+    <div class="page-header-content">
+      <div class="header-pill">
+        <i data-lucide="heart-handshake"></i>
+        <span>Resonate Church Street Ministry</span>
+      </div>
+      <h1 class="page-title">Announcements</h1>
+      <p class="page-subtitle">
+        Stepping beyond walls. Meeting neighbors where they are — serving our unhoused community in <strong>Fremont, Newark, Union City, and Hayward</strong>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="container content-section">
+  <div class="stories-grid">
+    {% for item in announcements %}
+    <article class="story-card {% if item.priority == 'urgent' %}announcement-card-urgent{% endif %}">
+      <div class="story-card-top">
+        <div class="story-meta-row">
+          {% if item.pinned %}
+          <span class="guide-pill"><i data-lucide="pin"></i> Pinned</span>
+          {% endif %}
+          {% if item.priority == 'urgent' %}
+          <span class="announcement-urgent-badge"><i data-lucide="alert-circle"></i> Urgent Need</span>
+          {% endif %}
+          <span class="announcement-category">{{ item.category }}</span>
+          <span class="story-date"><i data-lucide="calendar"></i> {{ item.date_display }}</span>
+        </div>
+        <h2 class="story-title"><a href="/announcements/{{ item.slug }}">{{ item.title }}</a></h2>
+      </div>
+
+      <div class="story-card-body">
+        <p class="story-summary">{{ item.summary }}</p>
+      </div>
+
+      <div class="story-card-footer">
+        <div class="story-actions">
+          <span class="story-author"><i data-lucide="user"></i> {{ item.author }}</span>
+          <a href="/announcements/{{ item.slug }}" class="btn btn-outline btn-sm">
+            <span>Read More</span>
+            <i data-lucide="arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="empty-state">
+      <i data-lucide="bell"></i>
+      <p>No active announcements at this moment. Check back soon!</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

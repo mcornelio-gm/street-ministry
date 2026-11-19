@@ -39,30 +39,18 @@ def render_markdown(text: str) -> str:
     return markdown.markdown(text, extensions=MD_EXTENSIONS, extension_configs=MD_EXTENSION_CONFIGS)
 
 
-def get_welcome_doc() -> dict:
-    """Read and parse Documents/Welcome.md."""
-    path = os.path.join(DOCUMENTS_DIR, "Welcome.md")
-    if not os.path.exists(path):
-        return {
-            "title": "Welcome to Resonate Church Street Ministry",
-            "date": "",
-            "author": "",
-            "html": "<p>Welcome document coming soon.</p>",
-        }
-    post = frontmatter.load(path)
-    html_content = render_markdown(post.content)
-    return {
-        "title": post.metadata.get("title", "Welcome to Street Ministry"),
-        "date": post.metadata.get("date", ""),
-        "author": post.metadata.get("author", "Resonate Street Ministry"),
-        "metadata": post.metadata,
-        "html": html_content,
-        "raw": post.content,
-    }
+def _excerpt(text: str, limit: int = 175) -> str:
+    """Plain-text snippet from markdown body when no explicit summary is set."""
+    import re
+    plain = re.sub(r"[#>*`_\[\]()]+", " ", text or "")
+    plain = re.sub(r"\s+", " ", plain).strip()
+    if len(plain) <= limit:
+        return plain
+    return plain[:limit].rsplit(" ", 1)[0].rstrip(",;:") + "…"
 
 
 def get_announcements() -> list:
-    """Read all markdown announcements from Documents/Announcements, sorted by date descending."""
+    """Read all markdown announcements from Documents/Announcements, pinned first then newest."""
     announcements_dir = os.path.join(DOCUMENTS_DIR, "Announcements")
     files = glob.glob(os.path.join(announcements_dir, "*.md"))
     announcements = []
@@ -93,6 +81,7 @@ def get_announcements() -> list:
 
             slug = os.path.splitext(filename)[0]
             html_content = render_markdown(post.content)
+            word_count = len(post.content.split())
 
             announcements.append({
                 "slug": slug,
@@ -102,7 +91,10 @@ def get_announcements() -> list:
                 "date_display": display_date,
                 "author": post.metadata.get("author", "Ministry Team"),
                 "category": post.metadata.get("category", "General"),
-                "priority": post.metadata.get("priority", "standard").lower(),
+                "priority": str(post.metadata.get("priority", "standard")).lower(),
+                "pinned": bool(post.metadata.get("pinned")),
+                "summary": (post.metadata.get("summary") or "").strip() or _excerpt(post.content),
+                "read_time_min": max(1, round(word_count / 180)),
                 "metadata": post.metadata,
                 "html": html_content,
                 "raw": post.content,
@@ -110,9 +102,14 @@ def get_announcements() -> list:
         except Exception as e:
             print(f"Error parsing announcement {file_path}: {e}")
 
-    # Sort descending by date (filename as tiebreaker for a stable order)
-    announcements.sort(key=lambda x: (x["date_sort"], x["filename"]), reverse=True)
+    # Pinned announcements first, then newest by date (filename as tiebreaker)
+    announcements.sort(key=lambda x: (x["pinned"], x["date_sort"], x["filename"]), reverse=True)
     return announcements
+
+
+def get_announcement_by_slug(slug: str) -> dict | None:
+    """Find a specific announcement by its slug."""
+    return next((a for a in get_announcements() if a["slug"] == slug), None)
 
 
 def get_stories() -> list:

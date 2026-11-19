@@ -194,10 +194,12 @@ def test_announcement_create_and_delete(client):
         assert item["body"] == "Bring gloves."  # leading '# Title' stripped
         home = client.get("/").text
         assert "Zz Test Announcement" in home
-        # Dated 2030, so it must be listed before every real announcement
-        others = [a for a in content_store.list_items("announcements") if a["slug"] != slug]
+        # Dated 2030, so it must be listed before every non-pinned announcement
+        others = [a for a in content_store.list_items("announcements") if a["slug"] != slug and not a["pinned"]]
         for a in others:
             assert home.index("Zz Test Announcement") < home.index(a["title"].replace("&", "&amp;"))
+        # Detail page renders
+        assert client.get(f"/announcements/{slug}").status_code == 200
     finally:
         if os.path.exists(content_store._path("announcements", slug)):
             client.post(f"/admin/announcements/{slug}/delete")

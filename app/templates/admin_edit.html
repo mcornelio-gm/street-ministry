@@ -64,11 +64,16 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Priority</label>
+        <label>Priority &amp; Placement</label>
         <div class="admin-radio-row">
           <label><input type="radio" name="priority" value="standard" {% if m.priority != 'urgent' %}checked{% endif %}> Standard</label>
-          <label><input type="radio" name="priority" value="urgent" {% if m.priority == 'urgent' %}checked{% endif %}> Urgent (highlighted)</label>
+          <label><input type="radio" name="priority" value="urgent" {% if m.priority == 'urgent' %}checked{% endif %}> Urgent</label>
+          <label><input type="checkbox" name="pinned" value="on" {% if m.pinned %}checked{% endif %}> Pin to top</label>
         </div>
+      </div>
+      <div class="form-group admin-span-2">
+        <label for="summary">Summary <span class="admin-hint-inline">optional; shown on the Home card (auto-generated if blank)</span></label>
+        <textarea id="summary" name="summary" rows="2" maxlength="400">{{ m.summary or '' }}</textarea>
       </div>
       {% endif %}
     </div>

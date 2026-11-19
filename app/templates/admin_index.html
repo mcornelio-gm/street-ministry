@@ -39,8 +39,11 @@
           <td>
             {% if kind == "stories" %}<span class="city-pill city-{{ it.city|lower|replace(' ', '-') }}">{{ it.city }}</span>
             {% elif kind in ("guides", "teams", "about") %}
-            {% elif it.priority == "urgent" %}<span class="announcement-urgent-badge">Urgent</span>
-            {% else %}<span class="admin-muted">Standard</span>{% endif %}
+            {% else %}
+              {% if it.pinned %}<span class="badge badge-teal">Pinned</span> {% endif %}
+              {% if it.priority == "urgent" %}<span class="announcement-urgent-badge">Urgent</span>
+              {% elif not it.pinned %}<span class="admin-muted">Standard</span>{% endif %}
+            {% endif %}
           </td>
           <td class="admin-muted">{{ it.author }}</td>
           <td class="text-nowrap admin-row-actions">

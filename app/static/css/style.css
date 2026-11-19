@@ -539,3 +539,6 @@ form.is-submitting .save-progress { display: block; }
   0% { transform: translateX(-100%); }
   100% { transform: translateX(260%); }
 }
+
+/* Urgent announcement card on Home grid */
+.announcement-card-urgent { border-left: 4px solid var(--amber); background: var(--tint-amber); }

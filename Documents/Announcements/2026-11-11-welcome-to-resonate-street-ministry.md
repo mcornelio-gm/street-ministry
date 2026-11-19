@@ -2,9 +2,13 @@
 title: Welcome to Resonate Church Street Ministry
 date: 2026-11-11
 author: Street Ministry Outreach Team
+category: General
+priority: standard
+pinned: true
+summary: Loving our unhoused neighbors across Fremont, Newark, Union City, and Hayward—our heart, mission, and how to get involved.
 ---
 
-# Loving Our Unhoused Neighbors Across the East Bay
+## Loving Our Unhoused Neighbors Across the East Bay
 
 Welcome to the official portal for **Resonate Church Street Ministry**. We are a dedicated community of volunteers, pastors, and neighbors answering the call to step outside church walls and step onto the streets, creeks, sidewalks, and motel corridors of **Fremont, Newark, Union City, and Hayward**.
 
@@ -33,4 +37,3 @@ Whether you can pack lunches on Friday night, ride along on a Saturday morning o
 * Read the **[Volunteer Orientation & Safety Briefing](/guides/volunteer-guide)** before your first ride-along.
 * Be inspired by reading recent **[Stories](/stories)** from the field.
 * Have questions or wish to donate? Head over to **[About & Contact](/about)**.
-
