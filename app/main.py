@@ -5,6 +5,7 @@ Documents tab: MkDocs (Material) static site built from ./Documents and served a
 """
 import os
 import secrets
+import threading
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
@@ -59,18 +60,18 @@ admin.templates = templates
 app.include_router(admin_routes.router)
 app.include_router(admin.router)
 
-# Point Announcements/Stories at the Cloud Storage bucket (Cloud Run only),
-# then build the wiki so it reflects the bucket's current content.
+# Point editable folders at the Cloud Storage bucket (Cloud Run only), then build the
+# MkDocs wiki in a background thread so cold starts don't block the first page load.
 content_store.setup_content_mount()
+os.makedirs(SITE_DOCS_DIR, exist_ok=True)
 if (
-    not os.path.isdir(SITE_DOCS_DIR)
+    not os.path.exists(os.path.join(SITE_DOCS_DIR, "index.html"))
     or os.environ.get("CONTENT_MOUNT")
     or os.environ.get("REBUILD_DOCS") == "1"
 ):
-    md_engine.build_mkdocs()
+    threading.Thread(target=md_engine.build_mkdocs, daemon=True).start()
 
-if os.path.isdir(SITE_DOCS_DIR):
-    app.mount("/documents", StaticFiles(directory=SITE_DOCS_DIR, html=True), name="documents")
+app.mount("/documents", StaticFiles(directory=SITE_DOCS_DIR, html=True), name="documents")
 
 
 @app.get("/", response_class=HTMLResponse)
