@@ -35,9 +35,9 @@
       <tbody>
         {% for it in items %}
         <tr>
-          <td class="text-nowrap">{{ it.date }}</td>
-          <td><a href="/admin/{{ kind }}/{{ it.slug }}"><strong>{{ it.title }}</strong></a></td>
-          <td>
+          <td class="text-nowrap" data-label="{{ 'Updated' if kind in ('guides', 'teams', 'about') else 'Date' }}">{{ it.date }}</td>
+          <td class="cell-title"><a href="/admin/{{ kind }}/{{ it.slug }}"><strong>{{ it.title }}</strong></a></td>
+          <td class="cell-badge" {% if kind == 'stories' %}data-label="City"{% elif kind == 'announcements' %}data-label="Priority"{% endif %}>
             {% if kind == "stories" %}<span class="city-pill city-{{ it.city|lower|replace(' ', '-') }}">{{ it.city }}</span>
             {% elif kind in ("guides", "teams", "about") %}
             {% else %}
@@ -46,7 +46,7 @@
               {% elif not it.pinned %}<span class="admin-muted">Standard</span>{% endif %}
             {% endif %}
           </td>
-          <td class="admin-muted">{{ it.author }}</td>
+          <td class="admin-muted" data-label="Author">{{ it.author }}</td>
           <td class="text-nowrap admin-row-actions">
             <a href="/admin/{{ kind }}/{{ it.slug }}" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</a>
             <form method="post" action="/admin/{{ kind }}/{{ it.slug }}/delete"
@@ -76,16 +76,16 @@
       <tbody>
         {% for r in routes %}
         <tr>
-          <td><a href="/admin/routes/{{ r.id }}"><strong>{{ r.name }}</strong></a></td>
-          <td class="admin-muted">{{ r.leaders }}</td>
-          <td>
+          <td class="cell-title"><a href="/admin/routes/{{ r.id }}"><strong>{{ r.name }}</strong></a></td>
+          <td class="admin-muted" data-label="Leaders">{{ r.leaders }}</td>
+          <td data-label="Stops">
             {{ r.stops|length }} stop{{ "s" if r.stops|length != 1 }}
             {% if r.stops|selectattr("approx")|list or r.stops|selectattr("lat", "none")|list %}
             <span class="admin-warn" title="A stop is approximate (e.g. cross streets) or not on the map. Edit and drag its amber pin into place.">
               <i data-lucide="alert-triangle"></i> pin needs placing</span>
             {% endif %}
           </td>
-          <td class="admin-muted">{{ r.schedule or "—" }}</td>
+          <td class="admin-muted" data-label="Schedule">{{ r.schedule or "—" }}</td>
           <td class="text-nowrap admin-row-actions">
             <a href="/admin/routes/{{ r.id }}" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</a>
             <form method="post" action="/admin/routes/{{ r.id }}/delete"

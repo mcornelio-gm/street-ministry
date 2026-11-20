@@ -1,7 +1,7 @@
 ---
 title: Newark Jacks Route Update
 date: 2026-11-12
-author: Kent Mitchell
+author: Derrick Chan
 category: Route Logistics
 priority: standard
 aliases:
