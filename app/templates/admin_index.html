@@ -16,6 +16,7 @@
   </div>
 
   {% if flash %}<div class="admin-alert admin-alert-ok"><i data-lucide="check-circle"></i> {{ flash }}</div>{% endif %}
+  {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
 
   {% for s in sections %}
   {% set kind, items = s["kind"], s["items"] %}
@@ -99,6 +100,21 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <div class="card admin-list-card" style="padding: 1.25rem;">
+    <div class="admin-list-head" style="padding: 0 0 0.75rem;">
+      <h2><i data-lucide="qr-code"></i> Share QR Code</h2>
+    </div>
+    <form method="post" action="/admin/settings/share" class="contact-form" data-busy-text="Saving…">
+      <div class="form-group">
+        <label for="share_url">QR Code Target URL <span class="admin-hint-inline">leave blank to use the current site's Home URL</span></label>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <input id="share_url" name="share_url" type="url" value="{{ share_url }}" placeholder="e.g. https://tinyurl.com/streetmin" style="flex: 1; min-width: 240px;">
+          <button class="btn btn-primary btn-sm" type="submit"><i data-lucide="save"></i> Save</button>
+        </div>
+      </div>
+    </form>
   </div>
 </section>
 {% endblock %}

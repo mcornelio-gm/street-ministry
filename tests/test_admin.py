@@ -204,3 +204,34 @@ def test_announcement_create_and_delete(client):
         if os.path.exists(content_store._path("announcements", slug)):
             client.post(f"/admin/announcements/{slug}/delete")
     assert "Zz Test Announcement" not in client.get("/").text
+
+
+def test_share_qr_url_setting(client, monkeypatch, tmp_path):
+    from app import routes_data
+    monkeypatch.setattr(routes_data, "DATA_DIR", str(tmp_path))
+
+    # Signed out: rejected
+    assert client.post("/admin/settings/share", data={"share_url": "https://tinyurl.com/streetmin"},
+                       follow_redirects=False).headers["location"] == "/admin/login"
+
+    login(client)
+    # Default: blank -> falls back to window.location.origin + '/'
+    assert '"" || (window.location.origin + \'/\')' in client.get("/").text
+
+    # Set custom redirect URL
+    r = client.post("/admin/settings/share", data={"share_url": "https://tinyurl.com/streetmin"},
+                    follow_redirects=False)
+    assert r.status_code == 303 and "Share+QR+URL+saved" in r.headers["location"]
+    assert '"https://tinyurl.com/streetmin" ||' in client.get("/").text
+    assert 'value="https://tinyurl.com/streetmin"' in client.get("/admin").text
+
+    # Reject non-http(s) scheme
+    bad = client.post("/admin/settings/share", data={"share_url": "javascript:alert(1)"},
+                      follow_redirects=False)
+    assert bad.status_code == 303 and "err=" in bad.headers["location"]
+    assert '"https://tinyurl.com/streetmin" ||' in client.get("/").text  # unchanged
+
+    # Blank resets back to current URL
+    rst = client.post("/admin/settings/share", data={"share_url": ""}, follow_redirects=False)
+    assert rst.status_code == 303 and "reset" in rst.headers["location"]
+    assert '"" || (window.location.origin + \'/\')' in client.get("/").text

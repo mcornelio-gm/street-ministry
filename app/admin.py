@@ -115,14 +115,30 @@ async def dashboard(request: Request):
     for s in sections:
         s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],
                  items=content_store.list_items(s["kind"]))
-    from app import routes_data
+    from app import routes_data, settings_store
     routes, routes_version = routes_data.load()
     return _render(request, "admin_index.html", {
         "sections": sections,
         "routes": routes,
         "routes_version": routes_version,
+        "share_url": settings_store.get_share_url(),
         "flash": request.query_params.get("msg"),
+        "error": request.query_params.get("err"),
     })
+
+
+@router.post("/settings/share")
+def save_share_settings(request: Request, share_url: str = Form("")):
+    if not _user(request):
+        return _login_redirect()
+    from app import settings_store
+    try:
+        saved = settings_store.save_share_url(share_url)
+    except ValueError as e:
+        from urllib.parse import quote_plus
+        return RedirectResponse(url=f"/admin?err={quote_plus(str(e))}", status_code=303)
+    msg = "Share+QR+URL+saved" if saved else "Share+QR+reset+to+current+site+URL"
+    return RedirectResponse(url=f"/admin?msg={msg}", status_code=303)
 
 
 @router.get("/{kind}/new", response_class=HTMLResponse)

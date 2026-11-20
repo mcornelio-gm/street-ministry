@@ -269,7 +269,7 @@
       const copyBtn = document.getElementById('qrCopyBtn');
       if (!dialog || !openBtn) return;
 
-      const homeUrl = window.location.origin + '/';
+      const homeUrl = {{ site_share_url() | tojson }} || (window.location.origin + '/');
       let rendered = false;
 
       function renderQR() {

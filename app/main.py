@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))  # local only; Cloud Run uses Secret Manager
 
-from app import admin, admin_routes, content_store, md_engine, routes_data  # noqa: E402
+from app import admin, admin_routes, content_store, md_engine, routes_data, settings_store  # noqa: E402
 
 SITE_DOCS_DIR = os.path.join(PROJECT_ROOT, "site", "documents")
 ON_CLOUD_RUN = bool(os.environ.get("K_SERVICE"))
@@ -53,6 +53,7 @@ def _file_version(path: str) -> str:
 
 
 templates.env.globals["css_v"] = _file_version(os.path.join(BASE_DIR, "static", "css", "style.css"))
+templates.env.globals["site_share_url"] = settings_store.get_share_url
 admin.templates = templates
 # Route-editor endpoints first, so /admin/routes/... isn't caught by the generic /admin/{kind}/...
 app.include_router(admin_routes.router)
