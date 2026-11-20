@@ -38,3 +38,6 @@ site/
 
 # Self-service admin password changes (hashes); never commit
 .admin_passwords.json
+
+# Visitor inbox messages (private); never commit
+.messages.json

@@ -400,6 +400,8 @@ h1, h2, h3, h4 { font-family: var(--font-head); color: var(--slate-900); line-he
 .admin-muted { color: var(--slate-500); }
 .admin-footer-link { color: #64748b; text-decoration: none; }
 .admin-footer-link:hover { color: var(--teal-light); }
+.admin-footer-gear { display: inline-flex; align-items: center; gap: 0.25rem; vertical-align: middle; padding: 0.15rem 0.25rem; }
+.admin-footer-gear svg { width: 15px; height: 15px; }
 .admin-login-card { max-width: 420px; margin: 2rem auto; }
 .admin-login-head { text-align: center; margin-bottom: 1rem; }
 .admin-login-head h1 { margin: 0.5rem 0 0.25rem; }
@@ -616,3 +618,24 @@ form.is-submitting .save-progress { display: block; }
     font-size: 16px;
   }
 }
+
+/* Comments & Questions popup + unread Admin badge */
+.contact-dialog { max-width: 460px; }
+.contact-dialog-body { text-align: left; }
+.msg-type-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.msg-type-pill {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.35rem 0.7rem; border-radius: 999px; border: 1px solid var(--slate-300);
+  font-size: 0.84rem; font-weight: 500; cursor: pointer; background: var(--surface);
+}
+.msg-type-pill:has(input:checked) {
+  border-color: var(--teal); background: var(--tint-teal); color: var(--accent-text); font-weight: 600;
+}
+.admin-unread-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.35em; height: 1.35em; padding: 0 0.35em; border-radius: 999px;
+  background: var(--amber); color: #1f1300; font-size: 0.75rem; font-weight: 800;
+  vertical-align: middle; margin-left: 0.25rem;
+}
+.inbox-row-unread td { background: var(--tint-teal); }
+.inbox-body { white-space: pre-wrap; font-size: 0.92rem; line-height: 1.45; }

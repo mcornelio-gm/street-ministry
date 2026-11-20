@@ -8,3 +8,4 @@ __pycache__/
 tests/
 
 .admin_passwords.json
+.messages.json

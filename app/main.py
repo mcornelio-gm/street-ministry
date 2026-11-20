@@ -9,7 +9,7 @@ import threading
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))  # local only; Cloud Run uses Secret Manager
 
-from app import admin, admin_routes, content_store, md_engine, routes_data, settings_store  # noqa: E402
+from app import admin, admin_routes, content_store, md_engine, messages_store, routes_data, settings_store  # noqa: E402
 
 SITE_DOCS_DIR = os.path.join(PROJECT_ROOT, "site", "documents")
 ON_CLOUD_RUN = bool(os.environ.get("K_SERVICE"))
@@ -55,6 +55,8 @@ def _file_version(path: str) -> str:
 
 templates.env.globals["css_v"] = _file_version(os.path.join(BASE_DIR, "static", "css", "style.css"))
 templates.env.globals["site_share_url"] = settings_store.get_share_url
+templates.env.globals["unread_messages_count"] = messages_store.unread_count
+templates.env.globals["message_types"] = messages_store.MESSAGE_TYPES
 admin.templates = templates
 # Route-editor endpoints first, so /admin/routes/... isn't caught by the generic /admin/{kind}/...
 app.include_router(admin_routes.router)
@@ -249,6 +251,30 @@ async def about(request: Request):
 @app.get("/about/{slug}", response_class=HTMLResponse)
 async def about_detail(request: Request, slug: str):
     return _render_section_detail(request, "about", slug)
+
+
+@app.post("/messages")
+async def submit_message(request: Request):
+    ip = request.client.host if request.client else "unknown"
+    if messages_store.is_rate_limited(ip):
+        return JSONResponse(
+            {"ok": False, "error": "Too many messages sent. Please wait a few minutes."},
+            status_code=429,
+        )
+    form = await request.form()
+    try:
+        saved = messages_store.add_message(
+            name=str(form.get("name", "")),
+            contact=str(form.get("contact", "")),
+            types=[str(t) for t in form.getlist("types")],
+            body=str(form.get("body", "")),
+            honeypot=str(form.get("website", "")),
+        )
+    except ValueError as e:
+        return JSONResponse({"ok": False, "error": str(e)}, status_code=400)
+    if saved is not None:
+        messages_store.record_submission(ip)
+    return JSONResponse({"ok": True})
 
 
 # Note: Cloud Run reserves paths ending in "z" (e.g. /healthz), so use /health.

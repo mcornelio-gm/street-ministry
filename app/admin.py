@@ -115,16 +115,37 @@ async def dashboard(request: Request):
     for s in sections:
         s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],
                  items=content_store.list_items(s["kind"]))
-    from app import routes_data, settings_store
+    from app import messages_store, routes_data, settings_store
     routes, routes_version = routes_data.load()
+    messages = messages_store.list_messages()
     return _render(request, "admin_index.html", {
         "sections": sections,
         "routes": routes,
         "routes_version": routes_version,
+        "messages": messages,
+        "unread_count": sum(1 for m in messages if not m.get("read")),
         "share_url": settings_store.get_share_url(),
         "flash": request.query_params.get("msg"),
         "error": request.query_params.get("err"),
     })
+
+
+@router.post("/messages/{msg_id}/toggle")
+def toggle_message_read(request: Request, msg_id: str):
+    if not _user(request):
+        return _login_redirect()
+    from app import messages_store
+    messages_store.toggle_read(msg_id)
+    return RedirectResponse(url="/admin", status_code=303)
+
+
+@router.post("/messages/{msg_id}/delete")
+def delete_inbox_message(request: Request, msg_id: str):
+    if not _user(request):
+        return _login_redirect()
+    from app import messages_store
+    messages_store.delete_message(msg_id)
+    return RedirectResponse(url="/admin?msg=Deleted+message", status_code=303)
 
 
 @router.post("/settings/share")

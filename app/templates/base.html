@@ -69,6 +69,9 @@
 
       <!-- Action Button & Mobile Toggle -->
       <div class="header-actions">
+        <button type="button" class="theme-toggle" id="contactToggle" aria-label="Comments & Questions" title="Comments & Questions">
+          <i data-lucide="message-square"></i>
+        </button>
         <button type="button" class="theme-toggle" id="qrToggle" aria-label="Share site QR code" title="Share site QR code">
           <i data-lucide="qr-code"></i>
         </button>
@@ -174,9 +177,66 @@
 
     <div class="footer-bottom container">
       <p>&copy; 2026 Resonate Church Street Ministry. All rights reserved.</p>
-      <p class="gcp-tag">Hosted with care on Google Cloud · <a href="/admin" class="admin-footer-link">Admin</a></p>
+      {% set n_unread = unread_messages_count() %}
+      <p class="gcp-tag">
+        <a href="#" id="footerContactLink" class="admin-footer-link">Comments &amp; Questions</a> ·
+        Hosted with care on Google Cloud ·
+        <a href="/admin" class="admin-footer-link admin-footer-gear" aria-label="Admin" title="Admin"><i data-lucide="settings"></i>{% if n_unread %}<span class="admin-unread-badge" title="{{ n_unread }} unread message{{ 's' if n_unread != 1 }}">{{ n_unread }}</span>{% endif %}</a>
+      </p>
     </div>
   </footer>
+
+  <!-- Comments & Questions Dialog -->
+  <dialog id="contactDialog" class="qr-dialog contact-dialog" closedby="any" aria-labelledby="contactDialogTitle">
+    <div class="qr-dialog-body contact-dialog-body">
+      <div class="qr-dialog-head">
+        <h2 id="contactDialogTitle">Comments &amp; Questions</h2>
+        <button type="button" class="btn btn-ghost btn-sm" id="contactCloseBtn" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p class="qr-dialog-sub">Send a note, question, or prayer request to our ministry team.</p>
+
+      <div id="contactSuccess" class="admin-alert admin-alert-ok" style="display: none;">
+        <i data-lucide="check-circle"></i>
+        <span>Thank you! Your message has been sent to our ministry team.</span>
+      </div>
+      <div id="contactError" class="admin-alert admin-alert-error" style="display: none;"></div>
+
+      <form id="contactPopupForm" class="contact-form" novalidate>
+        <div class="form-group">
+          <label>Type</label>
+          <div class="msg-type-grid">
+            {% for t in message_types %}
+            <label class="msg-type-pill">
+              <input type="checkbox" name="types" value="{{ t }}" {% if t in ['Question', 'Volunteer'] %}data-needs-reply="1"{% endif %}>
+              <span>{{ t }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="msg_name">Your Name <span class="admin-hint-inline">optional</span></label>
+          <input id="msg_name" name="name" maxlength="100" placeholder="First name">
+        </div>
+        <div class="form-group">
+          <label for="msg_contact">Return Email or Phone <span class="admin-hint-inline" id="replyHint">optional; needed if you'd like a reply</span></label>
+          <input id="msg_contact" name="contact" maxlength="160" placeholder="email@example.com or (510) ...">
+        </div>
+        <div class="form-group">
+          <label for="msg_body">Message</label>
+          <textarea id="msg_body" name="body" rows="4" required maxlength="2000" placeholder="How can we help or pray for you?"></textarea>
+        </div>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" class="visually-hidden" aria-hidden="true">
+        <div class="qr-dialog-actions" style="justify-content: flex-end;">
+          <button type="button" class="btn btn-ghost btn-sm" id="contactCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="contactSubmitBtn">
+            <i data-lucide="send"></i><span>Send</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
 
   <!-- Share QR Code Dialog -->
   <dialog id="qrDialog" class="qr-dialog" closedby="any" aria-labelledby="qrDialogTitle">
@@ -303,16 +363,79 @@
         } catch (e) {}
       });
 
-      // Fallback light-dismiss for browsers without closedby="any" (e.g., Safari)
-      if (!('closedBy' in HTMLDialogElement.prototype)) {
-        dialog.addEventListener('click', (event) => {
-          if (event.target !== dialog) return;
-          const rect = dialog.getBoundingClientRect();
+      // Shared light-dismiss fallback for browsers without closedby="any" (e.g., Safari)
+      window._setupLightDismiss = (dlg) => {
+        if (!dlg || 'closedBy' in HTMLDialogElement.prototype) return;
+        dlg.addEventListener('click', (event) => {
+          if (event.target !== dlg) return;
+          const rect = dlg.getBoundingClientRect();
           const inside = rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
                          rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
-          if (!inside) dialog.close();
+          if (!inside) dlg.close();
         });
-      }
+      };
+      window._setupLightDismiss(dialog);
+    })();
+
+    // Comments & Questions popup form
+    (() => {
+      const dialog = document.getElementById('contactDialog');
+      const form = document.getElementById('contactPopupForm');
+      const errBox = document.getElementById('contactError');
+      const okBox = document.getElementById('contactSuccess');
+      const contactInput = document.getElementById('msg_contact');
+      const replyHint = document.getElementById('replyHint');
+      const submitBtn = document.getElementById('contactSubmitBtn');
+      if (!dialog || !form) return;
+
+      const open = (e) => {
+        if (e) e.preventDefault();
+        errBox.style.display = 'none';
+        okBox.style.display = 'none';
+        form.style.display = '';
+        dialog.showModal();
+      };
+      document.getElementById('contactToggle')?.addEventListener('click', open);
+      document.getElementById('footerContactLink')?.addEventListener('click', open);
+      document.getElementById('contactCloseBtn')?.addEventListener('click', () => dialog.close());
+      document.getElementById('contactCancelBtn')?.addEventListener('click', () => dialog.close());
+      window._setupLightDismiss?.(dialog);
+
+      // Mark contact required if Question or Volunteer is checked
+      const syncReplyReq = () => {
+        const needsReply = [...form.querySelectorAll('input[name="types"][data-needs-reply]:checked')].length > 0;
+        contactInput.required = needsReply;
+        replyHint.textContent = needsReply ? 'required for a reply' : "optional; needed if you'd like a reply";
+      };
+      form.addEventListener('change', syncReplyReq);
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errBox.style.display = 'none';
+        const origHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span><span>Sending…</span>';
+        try {
+          const res = await fetch('/messages', { method: 'POST', body: new FormData(form) });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            errBox.textContent = data.error || 'Could not send message.';
+            errBox.style.display = 'flex';
+          } else {
+            form.reset();
+            syncReplyReq();
+            form.style.display = 'none';
+            okBox.style.display = 'flex';
+          }
+        } catch (err) {
+          errBox.textContent = 'Network error. Please try again.';
+          errBox.style.display = 'flex';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origHtml;
+          lucide.createIcons();
+        }
+      });
     })();
   </script>
   {% block extra_scripts %}{% endblock %}
