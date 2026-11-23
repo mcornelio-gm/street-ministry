@@ -21,7 +21,7 @@ title: Street Outreach Routes
 
 ## Islanders
 
-**Leaders:** Michael Cornelio & Henry Garcia  
+**Leaders:** Michael & Cathy C; Henry & Anne G  
 **Cities:** Hayward
 
 The Islander Motel and Suites
@@ -33,7 +33,7 @@ The Islander Motel and Suites
 
 ## Newark Jacks
 
-**Leaders:** Derrick Chan  
+**Leaders:** Derrick C  
 **Cities:** Fremont
 
 | # | Stop | Address |
@@ -42,7 +42,7 @@ The Islander Motel and Suites
 
 ## Union City Haulers
 
-**Leaders:** Christina Huang & Clement Ng  
+**Leaders:** Christina H & Clement N  
 **Cities:** Union City
 
 | # | Stop | Address |
@@ -51,7 +51,7 @@ The Islander Motel and Suites
 
 ## Win O Bagels
 
-**Leaders:** Kent Mitchell & Julian Zanders  
+**Leaders:** Kent M & Julian Z  
 **Cities:** Fremont, Milpitas
 
 | # | Stop | Address |

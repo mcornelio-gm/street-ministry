@@ -1,7 +1,7 @@
 ---
 title: December Outreach and New Volunteers
 date: 2026-11-12
-author: Kent Mitchell
+author: Kent M
 category: Events
 priority: urgent
 aliases:

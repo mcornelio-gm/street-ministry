@@ -11,4 +11,4 @@ Real encounters, answered prayers, and moments of mutual transformation from the
 * [What Happens When You Trust a Friend (Newark)](2026-11-23-what-happens-when-you-trust-a-friend.md) — November 23, 2026
 * [Faithfulness in Every Plate (Hayward)](2026-11-23-faithfulness-in-every-plate.md) — November 23, 2026
 * [A 46-Hour Journey Home (Newark)](2026-11-23-a-46-hour-journey-home.md) — November 23, 2026
-* [A Full Song with Some Difficult Notes (Hayward)](2026-11-04-dennis-remembered-islander.md) — November 04, 2026
+* [A Full Song with Some Difficult Notes (Hayward)](2026-11-04-a-full-song-with-some-difficult-notes.md) — November 04, 2026

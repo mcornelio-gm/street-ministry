@@ -2,7 +2,8 @@
 title: Emergency Contacts
 date: 2026-11-18
 author: Street Ministry Leadership
-summary: 24/7 Alameda County 2-1-1, Mobile Crisis Team, and local non-emergency police dispatch numbers.
+summary: 24/7 Alameda County 2-1-1, Mobile Crisis Team, and local non-emergency police
+  dispatch numbers.
 ---
 
 If you or someone you know is unhoused and in immediate need of emergency shelter, medical care, or crisis support in Alameda County:
@@ -10,7 +11,7 @@ If you or someone you know is unhoused and in immediate need of emergency shelte
 - **Emergency (Life-Threatening):** `911`
 - **Alameda County 2-1-1:** Dial `2-1-1` or text `898211` (24/7 Coordinated Entry & Emergency Shelter)
 - **Mobile Crisis Team (Alameda County):** 1-800-491-9099
-- **Team Lead (On Call):** Kent Mitchell, (510) 709-9338
+- **Team Lead (On Call):** Kent M, (510) 709-9338
 
 ### Local Non-Emergency Dispatch
 - **Fremont PD:** (510) 790-6800

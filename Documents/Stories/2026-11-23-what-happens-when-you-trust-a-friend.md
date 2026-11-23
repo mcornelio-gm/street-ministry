@@ -1,7 +1,7 @@
 ---
 title: What Happens When You Trust a Friend
 date: 2026-11-23
-author: Derrick Chan
+author: Derrick C
 city: Newark
 tags:
 - Friends
