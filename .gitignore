@@ -41,3 +41,4 @@ site/
 
 # Visitor inbox messages (private); never commit
 .messages.json
+.admin_users.json

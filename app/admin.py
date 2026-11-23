@@ -101,6 +101,56 @@ def change_password(request: Request, current: str = Form(""), new: str = Form("
     return RedirectResponse(url="/admin?msg=Password+changed", status_code=303)
 
 
+@router.get("/users", response_class=HTMLResponse)
+async def users_page(request: Request):
+    if not _user(request):
+        return _login_redirect()
+    return _render(request, "admin_users.html", {
+        "admins": auth.list_admins(),
+        "min_length": auth.MIN_PASSWORD_LENGTH,
+        "flash": request.query_params.get("msg"),
+        "error": request.query_params.get("err"),
+    })
+
+
+@router.post("/users/add")
+def users_add(request: Request, username: str = Form(""), password: str = Form(""), confirm: str = Form("")):
+    user = _user(request)
+    if not user:
+        return _login_redirect()
+    try:
+        added = auth.add_admin(username, password, confirm, added_by=user)
+    except ValueError as e:
+        return _render(request, "admin_users.html", {
+            "admins": auth.list_admins(),
+            "min_length": auth.MIN_PASSWORD_LENGTH,
+            "flash": None,
+            "error": str(e),
+        }, 400)
+    return RedirectResponse(url=f"/admin/users?msg=Added+{added}", status_code=303)
+
+
+@router.post("/users/{username}/delete")
+def users_delete(request: Request, username: str):
+    user = _user(request)
+    if not user:
+        return _login_redirect()
+    target = (username or "").strip().lower()
+    try:
+        auth.delete_admin(target)
+    except ValueError as e:
+        return _render(request, "admin_users.html", {
+            "admins": auth.list_admins(),
+            "min_length": auth.MIN_PASSWORD_LENGTH,
+            "flash": None,
+            "error": str(e),
+        }, 400)
+    if target == user:
+        request.session.clear()
+        return _login_redirect()
+    return RedirectResponse(url=f"/admin/users?msg=Removed+{target}", status_code=303)
+
+
 @router.get("", response_class=HTMLResponse)
 async def dashboard(request: Request):
     if not _user(request):

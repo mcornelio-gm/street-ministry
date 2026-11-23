@@ -8,6 +8,8 @@
       <p class="admin-muted">Signed in as <strong>{{ admin_user }}</strong>. Changes go live within a few seconds.</p>
     </div>
     <div class="admin-list-actions">
+      <button type="button" id="adminHelpBtn" class="btn btn-ghost btn-sm"><i data-lucide="help-circle"></i> Help</button>
+      <a href="/admin/users" class="btn btn-ghost btn-sm"><i data-lucide="users"></i> Admins</a>
       <a href="/admin/password" class="btn btn-ghost btn-sm"><i data-lucide="key-round"></i> Change Password</a>
       <form method="post" action="/admin/logout">
         <button class="btn btn-ghost btn-sm" type="submit"><i data-lucide="log-out"></i> Sign Out</button>
@@ -190,10 +192,42 @@
     </div>
   </div>
 </dialog>
+
+<dialog id="adminHelpDialog" class="qr-dialog help-dialog" closedby="any" aria-labelledby="adminHelpTitle">
+  <div class="qr-dialog-body help-dialog-body">
+    <div class="qr-dialog-head">
+      <h2 id="adminHelpTitle">Ministry Admin Guide</h2>
+      <button type="button" id="adminHelpCloseBtn" class="btn btn-ghost btn-sm" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <p class="qr-dialog-sub">Use this dashboard to manage site content, outreach routes, and visitor messages:</p>
+    <ul class="help-list">
+      <li><strong>Inbox</strong> — View visitor comments, questions, stories, and prayer requests. Click an email or phone number to reply, <strong>Copy</strong> for a plain-text copy, <strong>Mark Read/Unread</strong> to update the footer badge, or <strong>Delete</strong> to remove it.</li>
+      <li><strong>Announcements</strong> — Post updates and urgent notices. You can <strong>Pin</strong> an announcement to the top or mark it <strong>Urgent</strong>.</li>
+      <li><strong>Stories, Guides, Teams &amp; About</strong> — Click <strong>New …</strong> or <strong>Edit</strong> to write in Markdown with a live preview. Keep stories privacy-first (first names or pseudonyms only).</li>
+      <li><strong>Routes</strong> — Add or edit outreach routes and stops. Street addresses and cross streets are geocoded automatically, and you can drag map pins into place.</li>
+      <li><strong>Share QR Code</strong> — Set a custom destination URL (like a short link) for the site’s QR code, or leave it blank to use the Home page URL.</li>
+      <li><strong>Publishing</strong> — Saved changes are stored in Cloud Storage and go live on the site within a few seconds.</li>
+    </ul>
+    <div class="qr-dialog-actions">
+      <button type="button" id="adminHelpDoneBtn" class="btn btn-primary btn-sm">Close</button>
+    </div>
+  </div>
+</dialog>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
+  (() => {
+    const helpDlg = document.getElementById('adminHelpDialog');
+    if (helpDlg) {
+      document.getElementById('adminHelpBtn')?.addEventListener('click', () => helpDlg.showModal());
+      document.getElementById('adminHelpCloseBtn')?.addEventListener('click', () => helpDlg.close());
+      document.getElementById('adminHelpDoneBtn')?.addEventListener('click', () => helpDlg.close());
+      window._setupLightDismiss?.(helpDlg);
+    }
+  })();
   (() => {
     const dialog = document.getElementById('confirmDialog');
     const bodyEl = document.getElementById('confirmDialogBody');

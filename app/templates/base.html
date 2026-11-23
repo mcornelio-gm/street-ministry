@@ -79,6 +79,9 @@
           <span class="to-dark"><i data-lucide="moon"></i><span class="visually-hidden">Switch to dark theme</span></span>
           <span class="to-light"><i data-lucide="sun"></i><span class="visually-hidden">Switch to light theme</span></span>
         </button>
+        <button type="button" class="theme-toggle" id="helpToggle" aria-label="Site help" title="Site help">
+          <i data-lucide="help-circle"></i>
+        </button>
         <button class="mobile-toggle" id="mobileMenuBtn" aria-label="Toggle navigation menu">
           <i data-lucide="menu"></i>
         </button>
@@ -180,7 +183,7 @@
       {% set n_unread = unread_messages_count() %}
       <p class="gcp-tag">
         <a href="#" id="footerContactLink" class="admin-footer-link">Comments &amp; Questions</a> ·
-        Hosted with care on Google Cloud ·
+        Created by StreetMin.org ·
         <a href="/admin" class="admin-footer-link admin-footer-gear" aria-label="Admin" title="Admin"><i data-lucide="settings"></i>{% if n_unread %}<span class="admin-unread-badge" title="{{ n_unread }} unread message{{ 's' if n_unread != 1 }}">{{ n_unread }}</span>{% endif %}</a>
       </p>
     </div>
@@ -255,6 +258,31 @@
           <i data-lucide="copy"></i><span>Copy Link</span>
         </button>
         <button type="button" class="btn btn-primary btn-sm" id="qrDoneBtn">Done</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Site Help Dialog -->
+  <dialog id="siteHelpDialog" class="qr-dialog help-dialog" closedby="any" aria-labelledby="siteHelpTitle">
+    <div class="qr-dialog-body help-dialog-body">
+      <div class="qr-dialog-head">
+        <h2 id="siteHelpTitle">About This Site</h2>
+        <button type="button" class="btn btn-ghost btn-sm" id="siteHelpCloseBtn" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p class="qr-dialog-sub">Resonate Church Street Ministry serves our unhoused neighbors across Fremont, Newark, Union City, and Hayward. Here’s what you’ll find in each section:</p>
+      <ul class="help-list">
+        <li><strong>Home &amp; Announcements</strong> — Recent updates, outreach schedules, and urgent needs.</li>
+        <li><strong>Guides</strong> — Practical field guides, safety tips, and local resource lists.</li>
+        <li><strong>Stories</strong> — Testimonies and moments from the street (names changed for privacy).</li>
+        <li><strong>Teams</strong> — Outreach teams and how to get involved.</li>
+        <li><strong>Routes</strong> — Interactive map and stop details for each outreach route.</li>
+        <li><strong>About</strong> — Ministry vision, partners, and immediate donation needs.</li>
+      </ul>
+      <p class="help-tip">Tip: Use <i data-lucide="message-square"></i> to send a question, story, or prayer request, or <i data-lucide="qr-code"></i> to share this site.</p>
+      <div class="qr-dialog-actions">
+        <button type="button" class="btn btn-primary btn-sm" id="siteHelpDoneBtn">Close</button>
       </div>
     </div>
   </dialog>
@@ -375,6 +403,16 @@
         });
       };
       window._setupLightDismiss(dialog);
+    })();
+
+    // Site Help dialog
+    (() => {
+      const dlg = document.getElementById('siteHelpDialog');
+      if (!dlg) return;
+      document.getElementById('helpToggle')?.addEventListener('click', () => dlg.showModal());
+      document.getElementById('siteHelpCloseBtn')?.addEventListener('click', () => dlg.close());
+      document.getElementById('siteHelpDoneBtn')?.addEventListener('click', () => dlg.close());
+      window._setupLightDismiss?.(dlg);
     })();
 
     // Comments & Questions popup form

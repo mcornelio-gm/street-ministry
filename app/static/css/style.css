@@ -622,6 +622,14 @@ form.is-submitting .save-progress { display: block; }
 /* Comments & Questions popup + unread Admin badge */
 .contact-dialog { max-width: 460px; }
 .contact-dialog-body { text-align: left; }
+.help-dialog { max-width: 540px; }
+.help-dialog-body { text-align: left; max-height: 85vh; overflow-y: auto; }
+.help-list { list-style: none; padding: 0; margin: 0.75rem 0 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.help-list li { font-size: 0.92rem; line-height: 1.45; color: var(--slate-700); padding-bottom: 0.55rem; border-bottom: 1px solid var(--slate-200); }
+.help-list li:last-child { border-bottom: none; padding-bottom: 0; }
+.help-list strong { color: var(--slate-900); }
+.help-tip { font-size: 0.85rem; color: var(--slate-600); margin: 0 0 1rem; }
+.help-tip svg { width: 14px; height: 14px; vertical-align: -2px; }
 .msg-type-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .msg-type-pill {
   display: inline-flex; align-items: center; gap: 0.35rem;

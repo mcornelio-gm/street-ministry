@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import threading
 import time
@@ -76,22 +77,118 @@ def overrides_path() -> str:
     return os.path.join(PROJECT_ROOT, ".admin_passwords.json")
 
 
-def _load_overrides() -> dict:
+def users_path() -> str:
+    mount = os.environ.get("CONTENT_MOUNT")
+    if mount:
+        return os.path.join(mount, "Private", "admin_users.json")
+    return os.path.join(PROJECT_ROOT, ".admin_users.json")
+
+
+def _load_json(path: str, default):
     try:
-        with open(overrides_path(), encoding="utf-8") as f:
-            return json.load(f)
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, type(default)) else default
     except (FileNotFoundError, ValueError):
-        return {}
+        return default
+
+
+def _write_private_json(path: str, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    os.replace(tmp, path)
+    try:
+        os.chmod(path, 0o600)
+    except OSError:
+        pass
+
+
+def _load_overrides() -> dict:
+    return _load_json(overrides_path(), {})
+
+
+def _load_user_store() -> dict:
+    data = _load_json(users_path(), {})
+    return {
+        "added": data.get("added") if isinstance(data.get("added"), dict) else {},
+        "removed": data.get("removed") if isinstance(data.get("removed"), dict) else {},
+    }
 
 
 def load_users() -> dict[str, str]:
-    """Current password hash per admin: a self-chosen one if set (and not superseded by an
-    owner reset), otherwise the owner-set one. Only users in ADMIN_USERS exist."""
+    """Current password hash per admin: base ADMIN_USERS minus any UI-removed entries
+    (unless superseded by a new hash in ADMIN_USERS), plus UI-added admins, with
+    self-chosen password overrides applied."""
     users = base_users()
+    store = _load_user_store()
+    for name, base_hash in store["removed"].items():
+        if users.get(name) == base_hash:
+            users.pop(name, None)
+    for name, entry in store["added"].items():
+        if isinstance(entry, dict) and entry.get("hash"):
+            users[name] = entry["hash"]
     for name, entry in _load_overrides().items():
         if name in users and entry.get("replaces") == users[name]:
             users[name] = entry["hash"]
     return users
+
+
+def list_admins() -> list[dict]:
+    base = base_users()
+    users = load_users()
+    return [
+        {"username": name, "source": "Owner" if name in base else "Added"}
+        for name in sorted(users)
+    ]
+
+
+_USERNAME_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,31}$")
+
+
+def add_admin(username: str, password: str, confirm: str, added_by: str = "") -> str:
+    """Create a new admin user in the private user store. Raises ValueError on invalid input."""
+    name = (username or "").strip().lower()
+    if not _USERNAME_RE.match(name):
+        raise ValueError("Username must be 2–32 characters (letters, numbers, - or _).")
+    if name in load_users():
+        raise ValueError(f"Admin '{name}' already exists.")
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"Use at least {MIN_PASSWORD_LENGTH} characters.")
+    if password != confirm:
+        raise ValueError("The passwords don't match.")
+    with _pw_lock:
+        store = _load_user_store()
+        store["removed"].pop(name, None)
+        store["added"][name] = {
+            "hash": hash_password(password),
+            "added_by": (added_by or "").strip().lower(),
+            "created": int(time.time()),
+        }
+        _write_private_json(users_path(), store)
+    return name
+
+
+def delete_admin(username: str):
+    """Remove an admin user (including self-deletion). Prevents deleting the last admin."""
+    name = (username or "").strip().lower()
+    users = load_users()
+    if name not in users:
+        raise ValueError(f"Admin '{name}' was not found.")
+    if len(users) <= 1:
+        raise ValueError("Cannot delete the last remaining admin.")
+    base = base_users()
+    with _pw_lock:
+        store = _load_user_store()
+        store["added"].pop(name, None)
+        if name in base:
+            store["removed"][name] = base[name]
+        _write_private_json(users_path(), store)
+        overrides = _load_overrides()
+        if name in overrides:
+            overrides.pop(name, None)
+            _write_private_json(overrides_path(), overrides)
 
 
 def change_password(username: str, current: str, new: str, confirm: str):
@@ -107,18 +204,11 @@ def change_password(username: str, current: str, new: str, confirm: str):
         raise ValueError("Choose a password different from your current one.")
     base = base_users()
     with _pw_lock:
+        store = _load_user_store()
+        replaces = base.get(name) if name in base and store["removed"].get(name) != base[name] else store["added"].get(name, {}).get("hash")
         data = _load_overrides()
-        data[name] = {"hash": hash_password(new), "replaces": base[name], "changed": int(time.time())}
-        path = overrides_path()
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        tmp = path + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        os.replace(tmp, path)
-        try:
-            os.chmod(path, 0o600)
-        except OSError:
-            pass
+        data[name] = {"hash": hash_password(new), "replaces": replaces, "changed": int(time.time())}
+        _write_private_json(overrides_path(), data)
 
 
 def password_fingerprint(username: str) -> str | None:

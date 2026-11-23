@@ -33,13 +33,19 @@ def test_documents_mkdocs_site():
 
 
 def test_stories_list_and_detail():
+    from html import escape
+    from app import content_store
+
     r = client.get("/stories")
     assert r.status_code == 200
     for city in ("Fremont", "Newark", "Union City", "Hayward"):
         assert city in r.text
-    d = client.get("/stories/2026-11-04-marcus-peralta-creek")
+    stories = content_store.list_items("stories")
+    assert stories, "expected at least one story"
+    first = stories[0]
+    d = client.get(f"/stories/{first['slug']}")
     assert d.status_code == 200
-    assert "Broken Tent Zipper" in d.text
+    assert escape(first["title"]) in d.text
     assert client.get("/stories/does-not-exist").status_code == 404
 
 
