@@ -46,14 +46,18 @@ def test_post_message_validation(client):
     assert r.status_code == 200
     assert r.json() == {"ok": True}
 
+    r = client.post("/messages", data={"types": ["Event"], "body": "Could we add a coat drive?"})
+    assert r.status_code == 200
+    assert r.json() == {"ok": True}
+
     r = client.post(
         "/messages",
         data={"types": ["Comment"], "name": "Alex", "body": "Thank you for serving!"},
     )
     assert r.status_code == 200
     assert r.json() == {"ok": True}
-    assert len(messages_store.list_messages()) == 3
-    assert messages_store.unread_count() == 3
+    assert len(messages_store.list_messages()) == 4
+    assert messages_store.unread_count() == 4
 
 
 def test_honeypot_and_rate_limit(client):

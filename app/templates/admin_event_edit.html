@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}{{ 'New Event' if is_new else 'Edit ' ~ event.title }} | Admin{% endblock %}
+
+{% block content %}
+<section class="container admin-section">
+  <nav class="breadcrumb-nav">
+    <a href="/admin">Admin</a><span class="sep">/</span>
+    <span class="current">{{ 'New Event' if is_new else event.title }}</span>
+  </nav>
+
+  <div class="card" style="padding: 1.5rem; max-width: 680px;">
+    <h1 style="margin-top: 0;">{{ 'New Calendar Event' if is_new else 'Edit Event' }}</h1>
+    {% if error %}<div class="admin-alert admin-alert-error"><i data-lucide="alert-circle"></i> {{ error }}</div>{% endif %}
+
+    <form method="post" action="/admin/events/save" class="contact-form" data-busy-text="Saving…">
+      <input type="hidden" name="id" value="{{ event.id }}">
+
+      <div class="form-group">
+        <label for="ev_title">Event Title</label>
+        <input id="ev_title" name="title" value="{{ event.title }}" required placeholder="e.g. Fremont Street Outreach">
+      </div>
+
+      <div class="admin-form-grid">
+        <div class="form-group">
+          <label for="ev_recurrence">Repeat</label>
+          <select id="ev_recurrence" name="recurrence">
+            <option value="once" {% if event.recurrence == 'once' %}selected{% endif %}>One-time</option>
+            <option value="weekly" {% if event.recurrence == 'weekly' %}selected{% endif %}>Weekly (perpetual)</option>
+            <option value="biweekly" {% if event.recurrence == 'biweekly' %}selected{% endif %}>Every 2 weeks (perpetual)</option>
+            <option value="monthly" {% if event.recurrence == 'monthly' %}selected{% endif %}>Monthly (perpetual)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ev_city">City / Area <span class="admin-hint-inline">optional</span></label>
+          <select id="ev_city" name="city">
+            {% for c in cities %}
+            <option value="{{ c }}" {% if event.city == c %}selected{% endif %}>{{ c or '— None —' }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ev_start">Start Date</label>
+          <input id="ev_start" name="start_date" type="date" value="{{ event.start_date }}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="ev_end">Repeat Until <span class="admin-hint-inline">leave blank to repeat forever</span></label>
+          <input id="ev_end" name="end_date" type="date" value="{{ event.end_date }}">
+        </div>
+      </div>
+
+      <div class="form-group" id="weekdaysGroup">
+        <label>Day(s) of Week <span class="admin-hint-inline">defaults to Start Date's weekday if none checked</span></label>
+        <div class="msg-type-grid">
+          {% for name in weekday_names %}
+          {% set idx = loop.index0 %}
+          <label class="msg-type-pill">
+            <input type="checkbox" name="weekdays" value="{{ idx }}" {% if idx in event.weekdays %}checked{% endif %}>
+            <span>{{ name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group" id="monthlyWeeksGroup">
+        <label>Which Week(s) of the Month <span class="admin-hint-inline">e.g. 1st &amp; 3rd; leave blank for same day-of-month</span></label>
+        <div class="msg-type-grid">
+          {% for val, label in monthly_week_labels.items() %}
+          <label class="msg-type-pill">
+            <input type="checkbox" name="monthly_weeks" value="{{ val }}" {% if val in event.monthly_weeks %}checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="admin-form-grid">
+        <div class="form-group">
+          <label for="ev_time">Time <span class="admin-hint-inline">optional</span></label>
+          <input id="ev_time" name="time" value="{{ event.time }}" placeholder="e.g. 9:00 AM – 12:00 PM">
+        </div>
+        <div class="form-group">
+          <label for="ev_location">Location / Meet Spot <span class="admin-hint-inline">optional</span></label>
+          <input id="ev_location" name="location" value="{{ event.location }}" placeholder="e.g. Resonate Church Parking Lot">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ev_notes">Notes <span class="admin-hint-inline">optional</span></label>
+        <textarea id="ev_notes" name="notes" rows="3" placeholder="What to bring, parking, team contact...">{{ event.notes }}</textarea>
+      </div>
+
+      <div class="form-group" id="skipDatesGroup">
+        <label for="ev_skips">Skip Dates <span class="admin-hint-inline">optional, comma-separated YYYY-MM-DD (e.g. holidays)</span></label>
+        <input id="ev_skips" name="skip_dates" value="{{ event.skip_dates | join(', ') }}" placeholder="e.g. 2026-12-25, 2027-01-01">
+      </div>
+
+      <div class="contact-form-actions">
+        <a href="/admin" class="btn btn-ghost btn-sm">Cancel</a>
+        <button class="btn btn-primary btn-sm" type="submit"><i data-lucide="save"></i> Save Event</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (() => {
+    const rec = document.getElementById('ev_recurrence');
+    const wkGroup = document.getElementById('weekdaysGroup');
+    const mGroup = document.getElementById('monthlyWeeksGroup');
+    const skipGroup = document.getElementById('skipDatesGroup');
+    const sync = () => {
+      const v = rec?.value || 'once';
+      if (wkGroup) wkGroup.style.display = v === 'once' ? 'none' : '';
+      if (mGroup) mGroup.style.display = v === 'monthly' ? '' : 'none';
+      if (skipGroup) skipGroup.style.display = v === 'once' ? 'none' : '';
+    };
+    rec?.addEventListener('change', sync);
+    sync();
+  })();
+</script>
+{% endblock %}

@@ -61,6 +61,10 @@
           <i data-lucide="map-pin"></i>
           <span>Routes</span>
         </a>
+        <a href="/calendar" class="nav-tab {% if active_tab == 'calendar' %}active{% endif %}">
+          <i data-lucide="calendar"></i>
+          <span>Calendar</span>
+        </a>
         <a href="/about" class="nav-tab {% if active_tab == 'about' %}active{% endif %}">
           <i data-lucide="info"></i>
           <span>About</span>
@@ -110,6 +114,10 @@
         <a href="/routes" class="mobile-nav-link {% if active_tab == 'routes' %}active{% endif %}">
           <i data-lucide="map-pin"></i>
           <span>Routes & Map</span>
+        </a>
+        <a href="/calendar" class="mobile-nav-link {% if active_tab == 'calendar' %}active{% endif %}">
+          <i data-lucide="calendar"></i>
+          <span>Calendar</span>
         </a>
         <a href="/about" class="mobile-nav-link {% if active_tab == 'about' %}active{% endif %}">
           <i data-lucide="info"></i>
@@ -278,6 +286,7 @@
         <li><strong>Stories</strong> — Testimonies and moments from the street (names changed for privacy).</li>
         <li><strong>Teams</strong> — Outreach teams and how to get involved.</li>
         <li><strong>Routes</strong> — Interactive map and stop details for each outreach route.</li>
+        <li><strong>Calendar</strong> — Monthly outreach schedule and recurring ministry events.</li>
         <li><strong>About</strong> — Ministry vision, partners, and immediate donation needs.</li>
       </ul>
       <p class="help-tip">Tip: Use <i data-lucide="message-square"></i> to send a question, story, or prayer request, or <i data-lucide="qr-code"></i> to share this site.</p>

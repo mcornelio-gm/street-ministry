@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Outreach Calendar{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow"><i data-lucide="calendar"></i> Schedule &amp; Outreach</div>
+    <h1>Outreach Calendar</h1>
+    <p class="hero-sub">Upcoming outreach nights, meal preps, and ministry events across the East Bay.</p>
+  </div>
+</section>
+
+<section class="container cal-section">
+  <div class="cal-toolbar">
+    <div class="cal-nav">
+      <a href="/calendar?month={{ prev_month }}" class="btn btn-outline btn-sm" aria-label="Previous month">
+        <i data-lucide="chevron-left"></i> Prev
+      </a>
+      <h2 class="cal-month-title">{{ grid.month_name }}</h2>
+      <a href="/calendar?month={{ next_month }}" class="btn btn-outline btn-sm" aria-label="Next month">
+        Next <i data-lucide="chevron-right"></i>
+      </a>
+      <a href="/calendar" class="btn btn-ghost btn-sm">Today</a>
+    </div>
+    <a href="/calendar.ics" class="btn btn-outline btn-sm" title="Subscribe or download iCalendar file">
+      <i data-lucide="calendar-plus"></i> Add to Calendar (.ics)
+    </a>
+  </div>
+
+  <!-- Desktop Monthly Grid -->
+  <div class="card cal-grid-card">
+    <div class="cal-weekdays">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="cal-grid">
+      {% for week in grid.weeks %}
+        {% for cell in week %}
+        <div class="cal-cell {% if not cell.in_month %}cal-cell-muted{% endif %} {% if cell.is_today %}cal-cell-today{% endif %}">
+          <div class="cal-day-num">{{ cell.day }}</div>
+          {% if cell.occurrences %}
+          <div class="cal-cell-events">
+            {% for o in cell.occurrences %}
+            <a href="#ev-{{ cell.date_str }}-{{ loop.index }}" class="cal-pill" title="{{ o.title }}{% if o.time %} ({{ o.time }}){% endif %}">
+              {% if o.time %}<span class="cal-pill-time">{{ o.time.split('–')[0].split('-')[0].strip() }}</span> {% endif %}{{ o.title }}
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Event List (Primary on mobile, detailed view on desktop) -->
+  <div class="cal-list-wrap">
+    <h3>Events in {{ grid.month_name }}</h3>
+    {% if grid.occurrences %}
+    <div class="cal-event-list">
+      {% for o in grid.occurrences %}
+      <article class="card cal-event-card" id="ev-{{ o.date_str }}-{{ loop.index }}">
+        <div class="cal-event-date">
+          <span class="cal-event-dow">{{ o.date.strftime('%a') }}</span>
+          <span class="cal-event-day">{{ o.date.day }}</span>
+          <span class="cal-event-mon">{{ o.date.strftime('%b') }}</span>
+        </div>
+        <div class="cal-event-body">
+          <div class="cal-event-top">
+            <h4>{{ o.title }}</h4>
+            {% if o.city %}<span class="city-pill city-{{ o.city|lower|replace(' ', '-') }}">{{ o.city }}</span>{% endif %}
+          </div>
+          <div class="cal-event-meta">
+            {% if o.time %}<span><i data-lucide="clock"></i> {{ o.time }}</span>{% endif %}
+            {% if o.location %}<span><i data-lucide="map-pin"></i> {{ o.location }}</span>{% endif %}
+            {% if o.recurrence != 'once' %}<span class="tag-pill">{{ o.recurrence_label }}</span>{% endif %}
+          </div>
+          {% if o.notes %}<p class="cal-event-notes">{{ o.notes }}</p>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding: 1.5rem; text-align: center; color: var(--slate-600);">
+      No outreach events scheduled for {{ grid.month_name }}.
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

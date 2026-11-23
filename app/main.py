@@ -9,7 +9,7 @@ import threading
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))  # local only; Cloud Run uses Secret Manager
 
-from app import admin, admin_routes, content_store, md_engine, messages_store, routes_data, settings_store  # noqa: E402
+from app import admin, admin_calendar, admin_routes, calendar_data, content_store, md_engine, messages_store, routes_data, settings_store  # noqa: E402
 
 SITE_DOCS_DIR = os.path.join(PROJECT_ROOT, "site", "documents")
 ON_CLOUD_RUN = bool(os.environ.get("K_SERVICE"))
@@ -58,8 +58,9 @@ templates.env.globals["site_share_url"] = settings_store.get_share_url
 templates.env.globals["unread_messages_count"] = messages_store.unread_count
 templates.env.globals["message_types"] = messages_store.MESSAGE_TYPES
 admin.templates = templates
-# Route-editor endpoints first, so /admin/routes/... isn't caught by the generic /admin/{kind}/...
+# Route/Calendar-editor endpoints first, so /admin/routes/... and /admin/events/... aren't caught by /admin/{kind}/...
 app.include_router(admin_routes.router)
+app.include_router(admin_calendar.router)
 app.include_router(admin.router)
 
 # Point editable folders at the Cloud Storage bucket (Cloud Run only), then build the
@@ -241,6 +242,43 @@ async def routes(request: Request):
 @app.get("/api/routes")
 async def api_routes():
     return routes_data.get_all_routes()
+
+
+@app.get("/calendar", response_class=HTMLResponse)
+async def calendar_page(request: Request, month: str = ""):
+    from datetime import date
+    today = date.today()
+    year, mon = today.year, today.month
+    if month and "-" in month:
+        parts = month.split("-", 1)
+        if parts[0].isdigit() and parts[1].isdigit():
+            y, m = int(parts[0]), int(parts[1])
+            if 1 <= m <= 12 and 2000 <= y <= 2100:
+                year, mon = y, m
+    prev_y, prev_m = (year - 1, 12) if mon == 1 else (year, mon - 1)
+    next_y, next_m = (year + 1, 1) if mon == 12 else (year, mon + 1)
+    events = calendar_data.list_events()
+    grid = calendar_data.month_grid(events, year, mon, today=today)
+    return templates.TemplateResponse(
+        request,
+        "calendar.html",
+        {
+            "active_tab": "calendar",
+            "grid": grid,
+            "prev_month": f"{prev_y:04d}-{prev_m:02d}",
+            "next_month": f"{next_y:04d}-{next_m:02d}",
+        },
+    )
+
+
+@app.get("/calendar.ics")
+async def calendar_ics():
+    ics = calendar_data.build_ics(calendar_data.list_events())
+    return Response(
+        content=ics,
+        media_type="text/calendar; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="street-ministry.ics"'},
+    )
 
 
 @app.get("/about", response_class=HTMLResponse)

@@ -11,7 +11,7 @@ import time
 from collections import defaultdict
 from datetime import datetime
 
-MESSAGE_TYPES = ["Question", "Comment", "Volunteer", "Story", "Donations", "Prayer"]
+MESSAGE_TYPES = ["Question", "Comment", "Volunteer", "Event", "Story", "Donations", "Prayer"]
 REPLY_REQUIRED_TYPES = {"Question", "Volunteer"}
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

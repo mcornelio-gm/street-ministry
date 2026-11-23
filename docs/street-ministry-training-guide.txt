@@ -1,0 +1,179 @@
+RESONATE CHURCH STREET MINISTRY — WEB APP OVERVIEW & TRAINING GUIDE
+Live Site: https://street-ministry-290723764988.us-west1.run.app
+Purpose: Source document for training slides, infographics, and walkthrough videos
+
+================================================================================
+1. MISSION & OVERVIEW
+================================================================================
+The Resonate Church Street Ministry web app is a mobile-friendly communication,
+coordination, and storytelling hub built for outreach teams serving unhoused
+neighbors across Fremont, Newark, Union City, and Hayward (Alameda County).
+
+Core Goals:
+- Keep volunteers informed with timely announcements, field guides, and team info.
+- Share interactive outreach routes and stop locations on a live Bay Area map.
+- Encourage the church and community through real stories from the street while
+  strictly protecting the privacy and dignity of the people we serve.
+- Give ministry leaders a simple, browser-based Admin dashboard to update
+  content, manage routes, and respond to visitor messages in seconds—no coding
+  or developer deployment required.
+
+Design & Accessibility Highlights:
+- Fast initial load with a lightweight loading screen.
+- Responsive layout designed for both desktop and mobile phones (iPhone/Android),
+  including stacked card tables on narrow screens.
+- Automatic Light and Dark mode with a manual theme toggle in the header.
+- Built on FastAPI, Leaflet + OpenStreetMap, and Google Cloud Run + Cloud Storage.
+
+
+================================================================================
+2. PUBLIC WEBSITE GUIDE (FOR VOLUNTEERS & VISITORS)
+================================================================================
+The public site is organized into six main navigation tabs plus four header
+utility buttons and footer links:
+
+A. Main Navigation Tabs
+-----------------------
+1. Home & Announcements (/)
+   - Displays ministry highlights and recent announcements.
+   - Urgent notices are badged in red ("Urgent") and important updates can be
+     pinned ("Pinned") to stay at the top.
+
+2. Guides (/guides)
+   - Practical field guides, volunteer orientation, safety briefings, and local
+     resource lists (including visual Mermaid flowcharts).
+
+3. Stories (/stories)
+   - Testimonies and moments from outreach across Fremont, Newark, Union City,
+     and Hayward.
+   - Privacy Standard: Stories use first names or pseudonyms ("name changed"),
+     never last names, exact sleeping spots, or photos without consent.
+
+4. Teams (/teams)
+   - Overview of outreach teams, schedules, and how volunteers can plug in.
+
+5. Routes (/routes)
+   - Interactive OpenStreetMap / Leaflet map showing outreach routes and stops.
+   - Route stops are often intentionally listed as approximate cross streets to
+     respect the privacy of unhoused neighbors.
+
+6. About (/about)
+   - Ministry vision, community partners, and the Immediate Donation Needs
+     checklist.
+
+B. Header Utility Buttons & Footer
+----------------------------------
+- Comments & Questions (Message Bubble icon, also linked in the footer):
+  Opens a popup form where visitors or volunteers can send a message to leaders.
+  * Message Types (checkboxes): Question, Comment, Volunteer, Story, Donations,
+    Prayer.
+  * Name: Optional.
+  * Return Email or Phone: Optional for general notes/stories/prayers, but
+    REQUIRED when "Question" or "Volunteer" is checked so a leader can reply.
+  * Built-in spam protection (honeypot field + per-IP rate limiting).
+
+- Share QR Code (QR Code icon):
+  Displays a scannable QR code and "Copy Link" button so anyone can share the
+  site in person on a phone.
+
+- Theme Toggle (Moon / Sun icon):
+  Switches between Dark and Light mode, or follows the device's system setting.
+
+- Site Help (? icon):
+  Opens a quick "About This Site" guide summarizing all six sections and how to
+  use the message and QR buttons.
+
+- Footer:
+  Includes the Comments & Questions link, Alameda County 2-1-1 helpline info,
+  "Created by StreetMin.org", and a discreet Gear icon linking to Admin.
+  When there are unread visitor messages, a red unread-count badge appears next
+  to the Gear icon.
+
+
+================================================================================
+3. MINISTRY ADMIN GUIDE (FOR LEADERS & EDITORS)
+================================================================================
+Leaders sign in by clicking the Gear icon in the footer (or visiting /admin).
+
+A. Signing In & Account Management
+----------------------------------
+- Login (/admin/login): Uses a username and password (protected by rate limiting
+  after 5 failed attempts).
+- Change Password (/admin/password): Any admin can update their own password
+  (minimum 10 characters). Changing your password keeps your current device
+  signed in and automatically signs out other devices.
+- Manage Admins (/admin/users):
+  * View all current admin accounts.
+  * Add Admin: Create a new leader account with a username and temporary
+    password (minimum 10 characters); they can then sign in and set their own
+    password via Change Password.
+  * Delete Admin: Remove an admin account (including your own—which signs you
+    out immediately). The system blocks deleting the very last remaining admin
+    so the site can never be locked out.
+- Help (? button in Admin): Opens the Ministry Admin Guide summarizing each
+  dashboard section.
+
+B. Managing the Inbox
+---------------------
+- Located at the top of /admin, showing all visitor submissions from the
+  Comments & Questions popup.
+- Displays received date/time, message text, selected type tags, and sender
+  name/contact.
+- Actions per message:
+  * Reply directly: Click the sender's email (mailto:) or phone number (tel:).
+  * Copy: Copies a clean plain-text (Unicode) summary of the message (Type, From,
+    Received, Body) to the clipboard for pasting into email, text, or Slack.
+  * Mark Read / Mark Unread: Updates the message status and the unread badge
+    on the public footer Gear icon.
+  * Delete: Prompts with a custom confirmation dialog before removing the
+    message.
+
+C. Managing Content (Announcements, Stories, Guides, Teams, About)
+------------------------------------------------------------------
+- Click "New <Type>" to create a post or "Edit" on any existing item.
+- Write using Markdown with a side-by-side Live Preview.
+- Announcements include toggles for "Pinned" and "Urgent" priority.
+- Stories include a City tag (Fremont, Newark, Union City, Hayward).
+- Deleting any item prompts with a custom confirmation dialog.
+
+D. Managing Routes (/admin/routes/new, /admin/routes/<id>)
+----------------------------------------------------------
+- Add or edit outreach routes and individual stops.
+- Street addresses are geocoded via US Census; cross streets and landmarks use
+  OpenStreetMap Nominatim scoped to the Bay Area.
+- Admins can drag any map pin into its exact position before saving.
+- Optimistic version checks prevent two editors from accidentally overwriting
+  each other's route updates.
+
+E. Share QR Code Settings
+-------------------------
+- At the bottom of /admin, admins can set a custom QR Code Target URL (for
+  example, a short link) or leave it blank to use the Home page URL.
+
+F. How Changes Go Live
+----------------------
+- All content, routes, messages, and admin overrides are saved directly to
+  Google Cloud Storage (and kept separate from source code).
+- Edits go live on the public website within a few seconds—no developer
+  redeployment is required.
+
+
+================================================================================
+4. KEY TAKEAWAYS FOR TRAINING SLIDES, INFOGRAPHICS & VIDEO
+================================================================================
+1. One Hub for Everyone:
+   - Volunteers get Guides, Teams, Routes, Stories, and Announcements in one
+     mobile-ready place.
+   - Visitors can ask questions, volunteer, share a story, or request prayer in
+     two taps.
+2. Privacy & Dignity First:
+   - Stories never include last names, exact sleeping locations, or unconsented
+     photos.
+   - Route stops use approximate cross streets where appropriate.
+3. Easy Leader Workflow (No Tech Skills Needed):
+   - Sign in via the footer Gear icon -> Check Inbox (with unread badge) ->
+     Post Announcements or Stories in Markdown -> Adjust Route pins on the map ->
+     Live in seconds.
+4. Built-In Team Self-Service:
+   - Leaders can change their own passwords, add new team admins, and copy
+     inbox messages with one click to coordinate follow-ups.

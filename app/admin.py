@@ -165,13 +165,15 @@ async def dashboard(request: Request):
     for s in sections:
         s.update(label=KINDS[s["kind"]]["label"], plural=KINDS[s["kind"]]["plural"],
                  items=content_store.list_items(s["kind"]))
-    from app import messages_store, routes_data, settings_store
+    from app import calendar_data, messages_store, routes_data, settings_store
     routes, routes_version = routes_data.load()
     messages = messages_store.list_messages()
+    events = [{**e, "recurrence_label": calendar_data.recurrence_label(e)} for e in calendar_data.list_events()]
     return _render(request, "admin_index.html", {
         "sections": sections,
         "routes": routes,
         "routes_version": routes_version,
+        "events": events,
         "messages": messages,
         "unread_count": sum(1 for m in messages if not m.get("read")),
         "share_url": settings_store.get_share_url(),

@@ -159,6 +159,38 @@
     </table>
   </div>
 
+  <div class="card admin-list-card">
+    <div class="admin-list-head">
+      <h2>Calendar Events <span class="badge badge-teal">{{ events|length }}</span></h2>
+      <div class="admin-list-actions">
+        <a href="/calendar" target="_blank" class="btn btn-ghost btn-sm"><i data-lucide="eye"></i> View on site</a>
+        <a href="/admin/events/new" class="btn btn-primary btn-sm"><i data-lucide="plus"></i> New Event</a>
+      </div>
+    </div>
+    <table class="routes-table admin-table">
+      <thead><tr><th>Start</th><th>Event</th><th>Schedule</th><th>City</th><th></th></tr></thead>
+      <tbody>
+        {% for ev in events %}
+        <tr>
+          <td class="text-nowrap" data-label="Start">{{ ev.start_date }}</td>
+          <td class="cell-title"><a href="/admin/events/{{ ev.id }}"><strong>{{ ev.title }}</strong></a></td>
+          <td data-label="Schedule"><span class="tag-pill">{{ ev.recurrence_label }}</span>{% if ev.time %} <span class="admin-muted">{{ ev.time }}</span>{% endif %}</td>
+          <td class="cell-badge" data-label="City">{% if ev.city %}<span class="city-pill city-{{ ev.city|lower|replace(' ', '-') }}">{{ ev.city }}</span>{% endif %}</td>
+          <td class="text-nowrap admin-row-actions">
+            <a href="/admin/events/{{ ev.id }}" class="btn btn-outline btn-sm"><i data-lucide="pencil"></i> Edit</a>
+            <form method="post" action="/admin/events/{{ ev.id }}/delete"
+                  data-confirm="Delete event “{{ ev.title }}”? This removes it from the calendar.">
+              <button class="btn btn-ghost btn-sm admin-delete" type="submit" title="Delete"><i data-lucide="trash-2"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="admin-muted">No calendar events yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
   <div class="card admin-list-card" style="padding: 1.25rem;">
     <div class="admin-list-head" style="padding: 0 0 0.75rem;">
       <h2><i data-lucide="qr-code"></i> Share QR Code</h2>
