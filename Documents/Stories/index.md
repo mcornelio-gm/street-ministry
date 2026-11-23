@@ -8,8 +8,7 @@ title: Stories from the Street
 
 Real encounters, answered prayers, and moments of mutual transformation from the sidewalks, motels, and encampments across Fremont, Newark, Union City, and Hayward.
 
-* [A Warm Cup of Coffee and a Broken Tent Zipper (Fremont)](2026-11-04-marcus-peralta-creek.md) — November 04, 2026
+* [What Happens When You Trust a Friend (Newark)](2026-11-23-what-happens-when-you-trust-a-friend.md) — November 23, 2026
+* [Faithfulness in Every Plate (Hayward)](2026-11-23-faithfulness-in-every-plate.md) — November 23, 2026
+* [A 46-Hour Journey Home (Newark)](2026-11-23-a-46-hour-journey-home.md) — November 23, 2026
 * [A Full Song with Some Difficult Notes (Hayward)](2026-11-04-dennis-remembered-islander.md) — November 04, 2026
-* [Finding Stability: Elena’s Journey Through the Newark Motel Corridor (Newark)](2026-10-22-elena-newark-motel.md) — October 22, 2026
-* [Rebuilding Trust Along the Decoto Rail Tracks (Union City)](2026-10-08-ray-decoto-union-city.md) — October 08, 2026
-* [Morning Conversations at San Lorenzo Creek (Hayward)](2026-09-29-coffee-and-hope-hayward.md) — September 29, 2026
