@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ev-7ea85c",
+    "title": "Huddle",
+    "recurrence": "weekly",
+    "start_date": "2026-11-23",
+    "end_date": "",
+    "weekdays": [
+      1
+    ],
+    "monthly_weeks": [],
+    "time": "6:00PM - 6:30PM",
+    "city": "Newark",
+    "location": "Resonate Church (Rear)",
+    "notes": "Food Distribution and Fellowship",
+    "skip_dates": []
+  }
+]
