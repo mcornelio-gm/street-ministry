@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Analytics | Admin{% endblock %}
+{% block content %}
+<section class="container admin-section">
+  <nav class="breadcrumb-nav"><a href="/admin">Admin</a><span class="sep">/</span><span class="current">Analytics</span></nav>
+
+  <div class="admin-topbar">
+    <div>
+      <h1>Analytics &amp; Page Interest</h1>
+      <p class="admin-muted">Public page views and unique visitors (computed from salted IP hashes; raw IPs are never stored).</p>
+    </div>
+    <form method="post" action="/admin/analytics/reset" data-confirm="Reset all recorded analytics stats?">
+      <button class="btn btn-outline btn-sm admin-delete" type="submit"><i data-lucide="rotate-ccw"></i> Reset Stats</button>
+    </form>
+  </div>
+
+  {% if flash %}<div class="admin-alert admin-alert-ok"><i data-lucide="check-circle"></i> {{ flash }}</div>{% endif %}
+
+  <div class="analytics-kpi-grid">
+    <div class="card analytics-kpi">
+      <span class="analytics-kpi-label">Last 7 Days</span>
+      <strong>{{ stats.views_7d }} views</strong>
+      <span class="admin-muted">{{ stats.unique_7d }} unique visitor{{ 's' if stats.unique_7d != 1 }}</span>
+    </div>
+    <div class="card analytics-kpi">
+      <span class="analytics-kpi-label">Last 30 Days</span>
+      <strong>{{ stats.views_30d }} views</strong>
+      <span class="admin-muted">{{ stats.unique_30d }} unique visitor{{ 's' if stats.unique_30d != 1 }}</span>
+    </div>
+    <div class="card analytics-kpi">
+      <span class="analytics-kpi-label">All Time</span>
+      <strong>{{ stats.views_all }} views</strong>
+      <span class="admin-muted">{{ stats.unique_all }} unique visitor{{ 's' if stats.unique_all != 1 }}</span>
+    </div>
+  </div>
+
+  <div class="card admin-list-card">
+    <div class="admin-list-head">
+      <h2><i data-lucide="trending-up"></i> Interest by Page / Article <span class="badge badge-teal">{{ stats.pages|length }}</span></h2>
+    </div>
+    <table class="routes-table admin-table">
+      <thead><tr><th>Page / Article</th><th>7d Views (Unique)</th><th>30d Views (Unique)</th><th>All-Time Views (Unique)</th></tr></thead>
+      <tbody>
+        {% for p in stats.pages %}
+        <tr>
+          <td class="cell-title"><a href="{{ p.path }}" target="_blank"><code>{{ p.path }}</code></a></td>
+          <td data-label="7 Days">{{ p.views_7d }} <span class="admin-muted">({{ p.unique_7d }})</span></td>
+          <td data-label="30 Days">{{ p.views_30d }} <span class="admin-muted">({{ p.unique_30d }})</span></td>
+          <td data-label="All Time"><strong>{{ p.views_all }}</strong> <span class="admin-muted">({{ p.unique_all }})</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="admin-muted">No public page visits recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card admin-list-card">
+    <div class="admin-list-head">
+      <h2><i data-lucide="calendar"></i> Recent Daily Traffic</h2>
+    </div>
+    <table class="routes-table admin-table">
+      <thead><tr><th>Date</th><th>Total Views</th><th>Unique Visitors</th></tr></thead>
+      <tbody>
+        {% for d in stats.daily %}
+        <tr>
+          <td class="text-nowrap" data-label="Date">{{ d.date }}</td>
+          <td data-label="Total Views">{{ d.views }}</td>
+          <td data-label="Unique Visitors">{{ d.unique }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<dialog id="confirmDialog" class="qr-dialog contact-dialog" closedby="any" aria-labelledby="confirmDialogTitle">
+  <div class="qr-dialog-card contact-dialog-card">
+    <div class="qr-dialog-head">
+      <h2 id="confirmDialogTitle">Confirm Reset</h2>
+      <button type="button" id="confirmCloseBtn" class="qr-close-btn" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <p id="confirmDialogBody" style="margin: 0.25rem 0 1.25rem; color: var(--slate-700);"></p>
+    <div class="contact-form-actions">
+      <button type="button" id="confirmCancelBtn" class="btn btn-ghost btn-sm">Cancel</button>
+      <button type="button" id="confirmDeleteBtn" class="btn btn-primary btn-sm" style="background: var(--red, #dc2626); border-color: var(--red, #dc2626);">Reset</button>
+    </div>
+  </div>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  (() => {
+    const dialog = document.getElementById('confirmDialog');
+    const bodyEl = document.getElementById('confirmDialogBody');
+    const delBtn = document.getElementById('confirmDeleteBtn');
+    let pendingForm = null;
+    if (dialog) {
+      window._setupLightDismiss?.(dialog);
+      document.getElementById('confirmCloseBtn')?.addEventListener('click', () => dialog.close());
+      document.getElementById('confirmCancelBtn')?.addEventListener('click', () => dialog.close());
+      delBtn?.addEventListener('click', () => {
+        if (!pendingForm) return;
+        const form = pendingForm;
+        pendingForm = null;
+        dialog.close();
+        form.submit();
+      });
+      dialog.addEventListener('close', () => { pendingForm = null; });
+    }
+    document.addEventListener('submit', (e) => {
+      const form = e.target;
+      if (!(form instanceof HTMLFormElement) || !form.dataset.confirm) return;
+      e.preventDefault();
+      pendingForm = form;
+      if (bodyEl) bodyEl.textContent = form.dataset.confirm;
+      dialog?.showModal();
+    });
+  })();
+</script>
+{% endblock %}

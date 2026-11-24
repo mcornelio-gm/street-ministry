@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))  # local only; Cloud Run uses Secret Manager
 
-from app import admin, admin_calendar, admin_routes, calendar_data, content_store, md_engine, messages_store, routes_data, settings_store  # noqa: E402
+from app import admin, admin_calendar, admin_routes, analytics_store, calendar_data, content_store, md_engine, messages_store, routes_data, settings_store  # noqa: E402
 
 SITE_DOCS_DIR = os.path.join(PROJECT_ROOT, "site", "documents")
 ON_CLOUD_RUN = bool(os.environ.get("K_SERVICE"))
@@ -40,6 +40,19 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+
+@app.middleware("http")
+async def track_page_views(request: Request, call_next):
+    response = await call_next(request)
+    if request.method == "GET" and response.status_code == 200:
+        try:
+            fwd = request.headers.get("x-forwarded-for", "")
+            ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
+            analytics_store.record_visit(request.url.path, ip, request.headers.get("user-agent", ""))
+        except Exception:
+            pass
+    return response
 
 
 def _file_version(path: str) -> str:

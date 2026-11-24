@@ -668,6 +668,12 @@ form.is-submitting .save-progress { display: block; }
   .cal-grid-card { display: none; }
   .cal-month-title { min-width: 0; font-size: 1.1rem; }
 }
+
+/* Admin Analytics KPI cards */
+.analytics-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.analytics-kpi { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.2rem; }
+.analytics-kpi-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--slate-500); }
+.analytics-kpi strong { font-size: 1.35rem; color: var(--slate-900); }
 .msg-type-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .msg-type-pill {
   display: inline-flex; align-items: center; gap: 0.35rem;

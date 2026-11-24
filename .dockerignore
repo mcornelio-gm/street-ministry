@@ -10,3 +10,4 @@ tests/
 .admin_passwords.json
 .messages.json
 .admin_users.json
+.analytics.json

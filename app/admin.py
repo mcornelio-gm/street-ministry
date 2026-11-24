@@ -151,6 +151,26 @@ def users_delete(request: Request, username: str):
     return RedirectResponse(url=f"/admin/users?msg=Removed+{target}", status_code=303)
 
 
+@router.get("/analytics", response_class=HTMLResponse)
+async def analytics_page(request: Request):
+    if not _user(request):
+        return _login_redirect()
+    from app import analytics_store
+    return _render(request, "admin_analytics.html", {
+        "stats": analytics_store.summary(),
+        "flash": request.query_params.get("msg"),
+    })
+
+
+@router.post("/analytics/reset")
+def analytics_reset(request: Request):
+    if not _user(request):
+        return _login_redirect()
+    from app import analytics_store
+    analytics_store.reset()
+    return RedirectResponse(url="/admin/analytics?msg=Analytics+reset", status_code=303)
+
+
 @router.get("", response_class=HTMLResponse)
 async def dashboard(request: Request):
     if not _user(request):
