@@ -6,7 +6,7 @@ city: Hayward
 tags:
 - Meals
 - Thanksgiving
-summary: Anne and Henry Garcia at the Islander Motel
+summary: Anne and Henry at the Islander Motel
 ---
 
 On Tuesday nights in Hayward, the residents of the Islander Motel know they can count on a familiar, welcoming sight. For years, Anne and Henry have been the steady heartbeat of the route--showing up week after week not just to deliver supplies, but to build genuine relationships with the people who call the motel home.
