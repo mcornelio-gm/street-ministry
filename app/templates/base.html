@@ -371,7 +371,7 @@
 
       function renderQR() {
         if (rendered) return;
-        urlEl.textContent = homeUrl;
+        urlEl.textContent = homeUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js';
         script.onload = () => {
